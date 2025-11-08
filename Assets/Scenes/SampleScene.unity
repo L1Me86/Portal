@@ -642,6 +642,40 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &94432384
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 94432385}
+  m_Layer: 3
+  m_Name: Platform3
+  m_TagString: PortalSurface
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &94432385
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 94432384}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 561877888}
+  - {fileID: 1305843834}
+  - {fileID: 1555007498}
+  m_Father: {fileID: 679624723}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &256426889
 GameObject:
   m_ObjectHideFlags: 0
@@ -1150,24 +1184,18 @@ Transform:
   - {fileID: 1038986510}
   - {fileID: 509353026}
   - {fileID: 256426890}
-  - {fileID: 1688073002}
-  - {fileID: 561877888}
   - {fileID: 2121192794}
   - {fileID: 1255767683}
   - {fileID: 1468386157}
   - {fileID: 959509123}
   - {fileID: 55682299}
   - {fileID: 747880582}
-  - {fileID: 1700531746}
-  - {fileID: 1305843834}
   - {fileID: 37046755}
   - {fileID: 1313956017}
   - {fileID: 340580037}
   - {fileID: 1859365176}
   - {fileID: 874851811}
   - {fileID: 1153053061}
-  - {fileID: 1269981840}
-  - {fileID: 1555007498}
   - {fileID: 447319896}
   - {fileID: 1005271415}
   - {fileID: 817004289}
@@ -1914,7 +1942,7 @@ GameObject:
   - component: {fileID: 561877889}
   m_Layer: 3
   m_Name: Block (33)
-  m_TagString: PortalSurface
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1932,7 +1960,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 412607029}
+  m_Father: {fileID: 94432385}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
 --- !u!61 &561877889
 BoxCollider2D:
@@ -2060,7 +2088,7 @@ Transform:
   m_GameObject: {fileID: 579026096}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 19.59, z: -2.3975449}
+  m_LocalPosition: {x: 0.27, y: 19.59, z: -2.3975449}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2323,6 +2351,8 @@ Transform:
   m_Children:
   - {fileID: 1768624846}
   - {fileID: 412607029}
+  - {fileID: 94432385}
+  - {fileID: 1478701401}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &747880581
@@ -3898,7 +3928,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 412607029}
+  m_Father: {fileID: 1478701401}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &1269981841
 BoxCollider2D:
@@ -4010,7 +4040,7 @@ GameObject:
   - component: {fileID: 1305843835}
   m_Layer: 3
   m_Name: Block (34)
-  m_TagString: PortalSurface
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4028,7 +4058,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 412607029}
+  m_Father: {fileID: 94432385}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
 --- !u!61 &1305843835
 BoxCollider2D:
@@ -4703,6 +4733,40 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &1478701400
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1478701401}
+  m_Layer: 3
+  m_Name: Platform2
+  m_TagString: PortalSurface
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1478701401
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1478701400}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1269981840}
+  - {fileID: 1700531746}
+  - {fileID: 1688073002}
+  m_Father: {fileID: 679624723}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1538518336
 GameObject:
   m_ObjectHideFlags: 0
@@ -4846,7 +4910,7 @@ GameObject:
   - component: {fileID: 1555007499}
   m_Layer: 3
   m_Name: Block (35)
-  m_TagString: PortalSurface
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4864,7 +4928,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 412607029}
+  m_Father: {fileID: 94432385}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
 --- !u!61 &1555007499
 BoxCollider2D:
@@ -5040,7 +5104,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 412607029}
+  m_Father: {fileID: 1478701401}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &1688073003
 BoxCollider2D:
@@ -5170,7 +5234,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 412607029}
+  m_Father: {fileID: 1478701401}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &1700531747
 BoxCollider2D:

@@ -8,26 +8,50 @@ public class GunController : MonoBehaviour
     public GameObject bulletPrefab;
     public float bulletSpeed = 15f;
 
-    public Color portalAColor = Color.blue;
-    public Color portalBColor = new Color(1f, 0.5f, 0f);
+    public Color blueColor = new Color(0.663f, 0.588f, 1f);
+    public Color orangeColor = new Color(1f, 0.68f, 0.36f);
 
-    private bool lastShotWasA = false; // чтобы чередовать цвета
+    private static Portal bluePortal;
+    private static Portal orangePortal;
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
-            Shoot();
+        if (Input.GetMouseButtonDown(0)) Shoot(true);
+        if (Input.GetMouseButtonDown(1)) Shoot(false);
     }
 
-    void Shoot()
+    void Shoot(bool isBlue)
     {
         GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
 
-        bool isA = !lastShotWasA;
-        lastShotWasA = isA;
-        bullet.GetComponent<SpriteRenderer>().color = isA ? portalAColor : portalBColor;
+        Bullet bulletScript = bullet.GetComponent<Bullet>();
+        bulletScript.setPortalType(isBlue);
+
+        bullet.GetComponent<SpriteRenderer>().color = isBlue ? blueColor : orangeColor;
 
         Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
         rb.velocity = firePoint.right * bulletSpeed;
+    }
+
+    public static void SetActivePortal(bool isBlue, Portal portal)
+    {
+        if (isBlue && bluePortal != null)
+        {
+            bluePortal.Unlink();
+            Destroy(bluePortal.gameObject);
+        }
+        if (!isBlue && orangePortal != null)
+        {
+            orangePortal.Unlink();
+            Destroy(orangePortal.gameObject);
+        }
+
+        if (isBlue) bluePortal = portal;
+        else orangePortal = portal;
+    }
+
+    public static Portal GetOppositePortal(bool isBlue)
+    {
+        return isBlue ? orangePortal : bluePortal;
     }
 }
