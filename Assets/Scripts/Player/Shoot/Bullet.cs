@@ -41,7 +41,7 @@ public class Bullet : MonoBehaviour
                 Debug.Log($"Portal created at {hitPoint} | Scale: {portalObj.transform.localScale}");
 
                 Portal opposite = GunController.GetOppositePortal(isBluePortal);
-                if(opposite != null)
+                if (opposite != null)
                 {
                     newPortal.LinkTo(opposite);
                 }
@@ -51,8 +51,16 @@ public class Bullet : MonoBehaviour
                 Destroy(gameObject);
                 return;
             }
+            else
+            {
+                Destroy(gameObject);
+            }
             current = current.parent;
         }
     }
 
+    private void OnBecameInvisible()
+    {
+        Destroy(gameObject);
+    }
 }
