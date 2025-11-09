@@ -6,6 +6,12 @@ public class Bullet : MonoBehaviour
 {
     public GameObject portalPrefab;
 
+    //void Start()
+    //{
+    //    GameObject player = GameObject.FindGameObjectWithTag("Player");
+    //    Physics2D.IgnoreCollision(GetComponent<Collider2D>(), player.GetComponent<Collider2D>());
+    //}
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.collider.CompareTag("PortalSurface"))
