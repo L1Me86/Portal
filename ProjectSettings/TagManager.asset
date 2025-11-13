@@ -6,6 +6,7 @@ TagManager:
   tags:
   - PortalSurface
   - Portal
+  - Ghost
   layers:
   - Default
   - TransparentFX

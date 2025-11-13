@@ -11,10 +11,10 @@ public class PlayerMovement : MonoBehaviour
     public float groundCheckRadius = 0.1f;
     public LayerMask groundLayer;
     public bool facingRight = true;
+    public float moveInput;
+    public float currentSpeed;
 
     private float accelerationTimer;
-    private float currentSpeed;
-    private float moveInput;
     private bool isGrounded;
     private Rigidbody2D rb;
    
