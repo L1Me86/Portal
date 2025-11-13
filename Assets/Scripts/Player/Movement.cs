@@ -17,7 +17,16 @@ public class PlayerMovement : MonoBehaviour
     private float moveInput;
     private bool isGrounded;
     private Rigidbody2D rb;
-   
+
+    [Header("Cube Pickup")]
+    public Transform cubeHoldPoint; // Точка, где будет держаться кубик
+    public float pickupRange = 4f;
+    public LayerMask cubeLayer;
+    public KeyCode pickupKey = KeyCode.E;
+
+    private Cube carriedCube;
+    private bool canPickup = true;
+
 
     void Start()
     {
@@ -46,6 +55,18 @@ public class PlayerMovement : MonoBehaviour
 
         float accelerationProgress = Mathf.Clamp01(accelerationTimer / accelerationTime);
         currentSpeed = Mathf.Lerp(0, moveSpeed, accelerationProgress);
+
+        if (Input.GetKeyDown(pickupKey))
+        {
+            if (carriedCube == null)
+            {
+                TryPickupCube();
+            }
+            else
+            {
+                DropCube();
+            }
+        }
     }
 
     void FixedUpdate()
@@ -81,5 +102,56 @@ public class PlayerMovement : MonoBehaviour
         Gizmos.color = Color.red;
         if (groundCheck != null)
             Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
+    }
+
+    void TryPickupCube()
+    {
+        if (!canPickup) return;
+
+        // Ищем кубики в радиусе
+        Collider2D[] nearbyCubes = Physics2D.OverlapCircleAll(transform.position, pickupRange, cubeLayer);
+
+        foreach (Collider2D col in nearbyCubes)
+        {
+            Cube cube = col.GetComponent<Cube>();
+            if (cube != null && cube.isPickable && !cube.isPickedUp)
+            {
+                PickupCube(cube);
+                break;
+            }
+        }
+    }
+
+    void PickupCube(Cube cube)
+    {
+        carriedCube = cube;
+        cube.PickUp(cubeHoldPoint);
+        canPickup = false;
+
+        // Запрещаем прыжок с кубиком (опционально)
+        // jumpForce /= 1.5f;
+    }
+
+    void DropCube()
+    {
+        if (carriedCube != null)
+        {
+            carriedCube.Drop();
+
+            // Бросаем кубик с небольшой силой вперед
+            Rigidbody2D cubeRb = carriedCube.GetComponent<Rigidbody2D>();
+            if (cubeRb != null)
+            {
+                float throwForce = facingRight ? 3f : -3f;
+                cubeRb.velocity = new Vector2(throwForce, 5f);
+            }
+
+            carriedCube = null;
+        }
+
+        canPickup = true;
+
+        // Восстанавливаем прыжок (если изменяли)
+        // jumpForce *= 1.5f;
     }
 }
