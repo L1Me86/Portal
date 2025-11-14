@@ -31,6 +31,7 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        GetComponent<Collider2D>().gameObject.transform.position = Vector3.up * 20;
     }
 
     void Update()

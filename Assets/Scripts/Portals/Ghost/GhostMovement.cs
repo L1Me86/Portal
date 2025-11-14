@@ -5,7 +5,7 @@ using UnityEngine;
 public class GhostMovement : MonoBehaviour
 {
     public Transform target;
-    public Vector3 offset;
+    static public Vector3 offset;
     public Transform head;
     public bool facingRight = true;
     public GameObject targetObject;
@@ -14,7 +14,7 @@ public class GhostMovement : MonoBehaviour
     private PlayerMovement playerMovement;
     void Start()
     {
-        offset = Vector3.up * 5; // исправить на 15
+        offset = Vector3.up * 25;
         if (targetObject != null)
         {
             rb = targetObject.GetComponent<Rigidbody2D>();
