@@ -1,11 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Build;
 using UnityEngine;
 
 public class Portal : MonoBehaviour
 {
     public Portal linkedPortal;
     public bool isBlue = true;
+
+    private Vector3 range;
 
     void Start()
     {
@@ -16,6 +19,7 @@ public class Portal : MonoBehaviour
 
         if (blueChild != null) blueChild.gameObject.SetActive(isBlue);
         if (orangeChild != null) orangeChild.gameObject.SetActive(!isBlue);
+
     }
 
     void CreateChildrenIfMissing()
@@ -54,13 +58,29 @@ public class Portal : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player") && linkedPortal != null)
+        if (linkedPortal != null)
         {
-            other.transform.position = linkedPortal.transform.position + Vector3.up * 0.5f;
+            range = linkedPortal.transform.position - this.transform.position;
+            if (other.CompareTag("Player"))
+            {
+                GhostMovement.offset = range;
+            }
+            if (other.CompareTag("PortalTrigger"))
+            {
+                other.GetComponentInParent<CapsuleCollider2D>().gameObject.transform.position += Vector3.right * 0.11f + range;
+                Debug.Log($"Portal at {linkedPortal.transform.position} | Teleported at: {other.transform.position}");
+            }
         }
     }
 
-    
 
-    
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.CompareTag("Player") && linkedPortal != null)
+            GhostMovement.offset = Vector3.up * 25;
+    }
+
+
+
+
 }
