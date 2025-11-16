@@ -6,6 +6,7 @@ TagManager:
   tags:
   - PortalSurface
   - Portal
+  - Cube
   layers:
   - Default
   - TransparentFX
@@ -51,6 +52,9 @@ TagManager:
     locked: 0
   - name: Player
     uniqueID: 3147209983
+    locked: 0
+  - name: Cube
+    uniqueID: 3112658641
     locked: 0
   - name: Portal
     uniqueID: 2566970031

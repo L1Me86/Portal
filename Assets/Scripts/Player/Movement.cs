@@ -19,6 +19,15 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody2D rb;
    
 
+    [Header("Cube Pickup")]
+    public Transform cubeHoldPoint;
+    public float pickupRange = 4f;
+    public KeyCode pickupKey = KeyCode.E;
+
+    private Cube carriedCube;
+    private bool canPickup = true;
+
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -81,5 +90,51 @@ public class PlayerMovement : MonoBehaviour
         Gizmos.color = Color.red;
         if (groundCheck != null)
             Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
+    }
+
+    void TryPickupCube()
+    {
+        if (!canPickup) return;
+
+        Collider2D[] nearby = Physics2D.OverlapCircleAll(transform.position, pickupRange);
+
+        foreach (Collider2D col in nearby)
+        {
+            if (col.CompareTag("Cube"))
+            {
+                Cube cube = col.GetComponent<Cube>();
+                if (cube != null && cube.isPickable && !cube.isPickedUp)
+                {
+                    PickupCube(cube);
+                    break;
+                }
+            }
+        }
+    }
+
+    void PickupCube(Cube cube)
+    {
+        carriedCube = cube;
+        cube.PickUp(cubeHoldPoint);
+        canPickup = false;
+    }
+
+    void DropCube()
+    {
+        if (carriedCube != null)
+        {
+            carriedCube.Drop();
+
+            Rigidbody2D cubeRb = carriedCube.GetComponent<Rigidbody2D>();
+            if (cubeRb != null)
+            {
+                float throwForce = facingRight ? 3f : -3f;
+                cubeRb.velocity = new Vector2(throwForce, 5f);
+            }
+
+            carriedCube = null;
+        }
+
+        canPickup = true;
     }
 }
