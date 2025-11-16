@@ -6,6 +6,8 @@ TagManager:
   tags:
   - PortalSurface
   - Portal
+  - Ghost
+  - PortalTrigger
   - Cube
   layers:
   - Default
