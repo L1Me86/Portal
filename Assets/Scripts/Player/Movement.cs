@@ -11,13 +11,22 @@ public class PlayerMovement : MonoBehaviour
     public float groundCheckRadius = 0.1f;
     public LayerMask groundLayer;
     public bool facingRight = true;
+    public float moveInput;
+    public float currentSpeed;
 
     private float accelerationTimer;
-    private float currentSpeed;
-    private float moveInput;
     private bool isGrounded;
     private Rigidbody2D rb;
-   
+
+    [Header("Cube Pickup")]
+    public Transform cubeHoldPoint; // Òî÷êà, ãäå áóäåò äåðæàòüñÿ êóáèê
+    public float pickupRange = 4f;
+    public LayerMask cubeLayer;
+    public KeyCode pickupKey = KeyCode.E;
+
+    private Cube carriedCube;
+    private bool canPickup = true;
+
 
     [Header("Cube Pickup")]
     public Transform cubeHoldPoint;
@@ -31,6 +40,7 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        GetComponent<Collider2D>().gameObject.transform.position = Vector3.up * 20;
     }
 
     void Update()
@@ -55,6 +65,18 @@ public class PlayerMovement : MonoBehaviour
 
         float accelerationProgress = Mathf.Clamp01(accelerationTimer / accelerationTime);
         currentSpeed = Mathf.Lerp(0, moveSpeed, accelerationProgress);
+
+        if (Input.GetKeyDown(pickupKey))
+        {
+            if (carriedCube == null)
+            {
+                TryPickupCube();
+            }
+            else
+            {
+                DropCube();
+            }
+        }
     }
 
     void FixedUpdate()
