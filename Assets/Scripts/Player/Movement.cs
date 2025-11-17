@@ -19,16 +19,6 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody2D rb;
 
     [Header("Cube Pickup")]
-    public Transform cubeHoldPoint; // Òî÷êà, ãäå áóäåò äåðæàòüñÿ êóáèê
-    public float pickupRange = 4f;
-    public LayerMask cubeLayer;
-    public KeyCode pickupKey = KeyCode.E;
-
-    private Cube carriedCube;
-    private bool canPickup = true;
-
-
-    [Header("Cube Pickup")]
     public Transform cubeHoldPoint;
     public float pickupRange = 4f;
     public KeyCode pickupKey = KeyCode.E;
