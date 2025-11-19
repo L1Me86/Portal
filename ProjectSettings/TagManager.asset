@@ -3,17 +3,12 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags:
-  - PortalSurface
-  - Portal
-  - Ghost
-  - PortalTrigger
-  - Cube
+  tags: []
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Ground
+  - 
   - Water
   - UI
   - 
@@ -45,19 +40,4 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
-    locked: 0
-  - name: BG
-    uniqueID: 303417877
-    locked: 0
-  - name: Platforms
-    uniqueID: 439728375
-    locked: 0
-  - name: Player
-    uniqueID: 3147209983
-    locked: 0
-  - name: Cube
-    uniqueID: 3112658641
-    locked: 0
-  - name: Portal
-    uniqueID: 2566970031
     locked: 0

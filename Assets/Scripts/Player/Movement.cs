@@ -11,16 +11,17 @@ public class PlayerMovement : MonoBehaviour
     public float groundCheckRadius = 0.1f;
     public LayerMask groundLayer;
     public bool facingRight = true;
-    public float moveInput;
-    public float currentSpeed;
 
     private float accelerationTimer;
+    private float currentSpeed;
+    private float moveInput;
     private bool isGrounded;
     private Rigidbody2D rb;
 
     [Header("Cube Pickup")]
-    public Transform cubeHoldPoint;
+    public Transform cubeHoldPoint; // Точка, где будет держаться кубик
     public float pickupRange = 4f;
+    public LayerMask cubeLayer;
     public KeyCode pickupKey = KeyCode.E;
 
     private Cube carriedCube;
@@ -30,11 +31,12 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        GetComponent<Collider2D>().gameObject.transform.position = Vector3.up * 20;
     }
 
     void Update()
     {
+        if (GameManager.IsPaused) return;
+
         moveInput = Input.GetAxis("Horizontal");
 
         if (moveInput != 0)
@@ -108,18 +110,16 @@ public class PlayerMovement : MonoBehaviour
     {
         if (!canPickup) return;
 
-        Collider2D[] nearby = Physics2D.OverlapCircleAll(transform.position, pickupRange);
+        // Ищем кубики в радиусе
+        Collider2D[] nearbyCubes = Physics2D.OverlapCircleAll(transform.position, pickupRange, cubeLayer);
 
-        foreach (Collider2D col in nearby)
+        foreach (Collider2D col in nearbyCubes)
         {
-            if (col.CompareTag("Cube"))
+            Cube cube = col.GetComponent<Cube>();
+            if (cube != null && cube.isPickable && !cube.isPickedUp)
             {
-                Cube cube = col.GetComponent<Cube>();
-                if (cube != null && cube.isPickable && !cube.isPickedUp)
-                {
-                    PickupCube(cube);
-                    break;
-                }
+                PickupCube(cube);
+                break;
             }
         }
     }
@@ -129,6 +129,9 @@ public class PlayerMovement : MonoBehaviour
         carriedCube = cube;
         cube.PickUp(cubeHoldPoint);
         canPickup = false;
+
+        // Запрещаем прыжок с кубиком (опционально)
+        // jumpForce /= 1.5f;
     }
 
     void DropCube()
@@ -137,6 +140,7 @@ public class PlayerMovement : MonoBehaviour
         {
             carriedCube.Drop();
 
+            // Бросаем кубик с небольшой силой вперед
             Rigidbody2D cubeRb = carriedCube.GetComponent<Rigidbody2D>();
             if (cubeRb != null)
             {
@@ -148,5 +152,8 @@ public class PlayerMovement : MonoBehaviour
         }
 
         canPickup = true;
+
+        // Восстанавливаем прыжок (если изменяли)
+        // jumpForce *= 1.5f;
     }
 }

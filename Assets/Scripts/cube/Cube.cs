@@ -5,16 +5,15 @@ public class Cube : MonoBehaviour
     public bool isPickable = true;
     public bool isPickedUp = false;
     public Transform holder;
-    public PlayerMovement player;
 
     private Rigidbody2D rb;
     private Collider2D col;
+    private bool wasTrigger; 
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
-        rb.gravityScale = player.gravityScale;
     }
 
     public void PickUp(Transform newHolder)
@@ -24,6 +23,7 @@ public class Cube : MonoBehaviour
         isPickedUp = true;
         holder = newHolder;
 
+        // Отключаем физику
         if (rb != null)
         {
             rb.isKinematic = true;
@@ -32,10 +32,14 @@ public class Cube : MonoBehaviour
         }
 
         if (col != null)
-            col.enabled = false;
+        {
+            wasTrigger = col.isTrigger;
+            col.isTrigger = true;
+        }
 
+        // Делаем кубик дочерним объектом
         transform.SetParent(holder);
-        transform.localPosition = Vector3.zero + Vector3.up * 0.5f;
+        transform.localPosition = Vector3.zero + Vector3.up * 0.5f; // Немного выше руки
     }
 
     public void Drop()
@@ -44,12 +48,17 @@ public class Cube : MonoBehaviour
 
         isPickedUp = false;
 
+        // Включаем физику
         if (rb != null)
             rb.isKinematic = false;
 
         if (col != null)
+        {
             col.enabled = true;
+            col.isTrigger = false;
+        }
 
+        // Убираем из дочерних объектов
         transform.SetParent(null);
         holder = null;
     }
