@@ -19,7 +19,7 @@ public class GunController : MonoBehaviour
         if (Input.GetMouseButtonDown(1)) Shoot(false);
     }
 
-    void Shoot()
+    void Shoot(bool isBlue)
     {
         GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
 
