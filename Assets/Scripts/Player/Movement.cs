@@ -35,6 +35,8 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        if (GameManager.IsPaused) return;
+
         moveInput = Input.GetAxis("Horizontal");
 
         if (moveInput != 0)

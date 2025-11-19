@@ -11,11 +11,10 @@ public class GunController : MonoBehaviour
     public Color blueColor = new Color(0.663f, 0.588f, 1f);
     public Color orangeColor = new Color(1f, 0.68f, 0.36f);
 
-    private static Portal bluePortal;
-    private static Portal orangePortal;
-
+    private bool lastShotWasA = false;
     void Update()
     {
+        if (GameManager.IsPaused) return;
         if (Input.GetMouseButtonDown(0)) Shoot(true);
         if (Input.GetMouseButtonDown(1)) Shoot(false);
     }
