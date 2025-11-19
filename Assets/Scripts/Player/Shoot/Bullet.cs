@@ -5,19 +5,62 @@ using UnityEngine;
 public class Bullet : MonoBehaviour
 {
     public GameObject portalPrefab;
+    private bool isBluePortal = true;
+
+    public void setPortalType(bool isBlue)
+    {
+        isBluePortal = isBlue;
+    }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.collider.CompareTag("PortalSurface"))
-        {
-            Vector2 hitPoint = collision.GetContact(0).point;
+        Collider2D hitCollider = collision.collider;
+        Transform current = hitCollider.transform;
 
-            Instantiate(portalPrefab, hitPoint, Quaternion.identity);
-            Destroy(gameObject);
-        }
-        else if (!collision.collider.CompareTag("Player"))
+        while (current != null)
         {
-            Destroy(gameObject);
-        }  
+            if (current.CompareTag("PortalSurface"))
+            {
+                Vector2 hitPoint = collision.GetContact(0).point;
+
+                GameObject portalObj = Instantiate(portalPrefab, hitPoint, Quaternion.identity);
+                Portal newPortal = portalObj.GetComponent<Portal>();
+                newPortal.isBlue = isBluePortal;
+
+                Transform activeChild = portalObj.transform.Find(isBluePortal ? "PortalBlue" : "PortalOrange");
+                if (activeChild != null)
+                {
+                    SpriteRenderer sr = activeChild.GetComponent<SpriteRenderer>();
+                    if (sr != null)
+                    {
+                        sr.sortingLayerName = "Portal";
+                        sr.sortingOrder = 100;
+                    }
+                }
+
+                Debug.Log($"Portal created at {hitPoint} | Scale: {portalObj.transform.localScale}");
+
+                Portal opposite = GunController.GetOppositePortal(isBluePortal);
+                if (opposite != null)
+                {
+                    newPortal.LinkTo(opposite);
+                }
+
+                GunController.SetActivePortal(isBluePortal, newPortal);
+
+                Destroy(gameObject);
+                return;
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+            current = current.parent;
+        }
+    }
+
+    private void OnBecameInvisible()
+    {
+        Destroy(gameObject);
     }
 }
