@@ -8,6 +8,7 @@ public class Cube : MonoBehaviour
 
     private Rigidbody2D rb;
     private Collider2D col;
+    private bool wasTrigger; 
 
     void Start()
     {
@@ -31,7 +32,10 @@ public class Cube : MonoBehaviour
         }
 
         if (col != null)
-            col.enabled = false;
+        {
+            wasTrigger = col.isTrigger;
+            col.isTrigger = true;
+        }
 
         // Делаем кубик дочерним объектом
         transform.SetParent(holder);
@@ -49,7 +53,10 @@ public class Cube : MonoBehaviour
             rb.isKinematic = false;
 
         if (col != null)
+        {
             col.enabled = true;
+            col.isTrigger = false;
+        }
 
         // Убираем из дочерних объектов
         transform.SetParent(null);

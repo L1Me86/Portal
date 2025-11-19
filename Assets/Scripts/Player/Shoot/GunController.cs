@@ -11,12 +11,12 @@ public class GunController : MonoBehaviour
     public Color portalAColor = Color.blue;
     public Color portalBColor = new Color(1f, 0.5f, 0f);
 
-    private bool lastShotWasA = false; // чтобы чередовать цвета
-
+    private bool lastShotWasA = false;
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
-            Shoot();
+        if (GameManager.IsPaused) return;
+        if (Input.GetMouseButtonDown(0)) Shoot(true);
+        if (Input.GetMouseButtonDown(1)) Shoot(false);
     }
 
     void Shoot()
