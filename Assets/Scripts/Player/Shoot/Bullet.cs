@@ -37,9 +37,11 @@ public class Bullet : MonoBehaviour
                         break;
                     case "PortalSurfaceBott":
                         newPortal.side = Portal.Side.Bottom;
+                        newPortal.transform.Rotate(0, 0, 90);
                         break;
                     case "PortalSurfaceUp":
                         newPortal.side = Portal.Side.Up;
+                        newPortal.transform.Rotate(0, 0, 90);
                         break;
                     default:
                         Debug.LogError("!!! Untagged surface portal creating attempt");

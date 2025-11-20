@@ -54,14 +54,14 @@ TagManager:
   - name: BG
     uniqueID: 303417877
     locked: 0
-  - name: Platforms
-    uniqueID: 439728375
-    locked: 0
   - name: Player
     uniqueID: 3147209983
     locked: 0
   - name: Cube
     uniqueID: 3112658641
+    locked: 0
+  - name: Platforms
+    uniqueID: 439728375
     locked: 0
   - name: Portal
     uniqueID: 2566970031
