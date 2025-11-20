@@ -19,13 +19,34 @@ public class Bullet : MonoBehaviour
 
         while (current != null)
         {
-            if (current.CompareTag("PortalSurface"))
+            if (current.tag.Length >= 13 && current.tag.Substring(0, 13) == "PortalSurface")
             {
                 Vector2 hitPoint = collision.GetContact(0).point;
 
                 GameObject portalObj = Instantiate(portalPrefab, hitPoint, Quaternion.identity);
                 Portal newPortal = portalObj.GetComponent<Portal>();
                 newPortal.isBlue = isBluePortal;
+                
+                switch (current.tag)
+                {
+                    case "PortalSurfaceRight":
+                        newPortal.side = Portal.Side.Right;
+                        break;
+                    case "PortalSurfaceLeft":
+                        newPortal.side = Portal.Side.Left;
+                        break;
+                    case "PortalSurfaceBott":
+                        newPortal.side = Portal.Side.Bottom;
+                        newPortal.transform.Rotate(0, 0, 90);
+                        break;
+                    case "PortalSurfaceUp":
+                        newPortal.side = Portal.Side.Up;
+                        newPortal.transform.Rotate(0, 0, 90);
+                        break;
+                    default:
+                        Debug.LogError("!!! Untagged surface portal creating attempt");
+                        break;
+                }
 
                 Transform activeChild = portalObj.transform.Find(isBluePortal ? "PortalBlue" : "PortalOrange");
                 if (activeChild != null)

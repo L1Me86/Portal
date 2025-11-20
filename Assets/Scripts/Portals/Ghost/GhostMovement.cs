@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class GhostMovement : MonoBehaviour
 {
@@ -35,6 +36,7 @@ public class GhostMovement : MonoBehaviour
         }
 
         head.localScale = playerMovement.head.localScale;
+        
     }
 
 
