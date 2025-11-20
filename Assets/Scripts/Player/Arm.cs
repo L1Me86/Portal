@@ -12,6 +12,7 @@ public class ArmRotation : MonoBehaviour
 
     void Update()
     {
+        if (GameManager.gameIsPaused) return;
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector3 direction = mousePos - arm.position;
         direction.z = 0;
