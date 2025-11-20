@@ -9,6 +9,11 @@ TagManager:
   - Ghost
   - PortalTrigger
   - Cube
+  - PortalSurfaceRight
+  - PortalSurfaceLeft
+  - PortalSurfaceBott
+  - PortalSurfaceUp
+  - PortalWallTriggerVertical
   layers:
   - Default
   - TransparentFX
