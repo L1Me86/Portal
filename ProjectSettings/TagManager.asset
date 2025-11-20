@@ -9,6 +9,8 @@ TagManager:
   - Ghost
   - PortalTrigger
   - Cube
+  - Bullet
+  - LaserReceiver
   layers:
   - Default
   - TransparentFX

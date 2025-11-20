@@ -16,6 +16,7 @@ public class GunController : MonoBehaviour
 
     void Update()
     {
+        if (GameManager.gameIsPaused) return;
         if (Input.GetMouseButtonDown(0)) Shoot(true);
         if (Input.GetMouseButtonDown(1)) Shoot(false);
     }
