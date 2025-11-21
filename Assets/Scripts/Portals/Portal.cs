@@ -57,16 +57,21 @@ public class Portal : MonoBehaviour
     {
         linkedPortal = otherPortal;
         otherPortal.linkedPortal = this;
+        Debug.Log($"{name} -> linked to -> {otherPortal.name}");
     }
 
     public void Unlink()
     {
         if (linkedPortal != null)
         {
-            linkedPortal.linkedPortal = null;
+            if (linkedPortal.linkedPortal == this)
+                linkedPortal.linkedPortal = null;
+
+            Debug.Log($"{name} -> unlinked from -> {linkedPortal.name}");
             linkedPortal = null;
         }
     }
+
 
     private void OnTriggerEnter2D(Collider2D other)
     {

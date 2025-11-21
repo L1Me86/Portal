@@ -62,12 +62,13 @@ public class Bullet : MonoBehaviour
 
 
                 Portal opposite = GunController.GetOppositePortal(isBluePortal);
+                GunController.SetActivePortal(isBluePortal, newPortal);
+
                 if (opposite != null)
                 {
                     newPortal.LinkTo(opposite);
                 }
 
-                GunController.SetActivePortal(isBluePortal, newPortal);
 
                 placed = true;
                 break;
