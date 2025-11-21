@@ -31,7 +31,7 @@ public class GhostMovement : MonoBehaviour
     void Update()
     {
         bool did = false;
-        if (calc != null && calc[0] == Portal.Side.Right)
+        if (calc != null && (calc[0] == Portal.Side.Right || calc[0] == Portal.Side.Left))
         {
             if (calc[1] == Portal.Side.Top || calc[1] == Portal.Side.Bottom)
             {
@@ -40,19 +40,31 @@ public class GhostMovement : MonoBehaviour
 
                 did = true;
             }
-        }/*
-        else if (calc == Portal.Side.Bottom)
-        {
-
         }
-        else if (calc == Portal.Side.Left)
+        if (calc != null && (calc[0] == Portal.Side.Bottom))
         {
+            if (calc[1] == Portal.Side.Right)
+            {
+                this.transform.rotation = target.transform.rotation * Quaternion.Euler(0, 0, -90);
+                transform.position = target.position + target.TransformDirection(offset);
 
+                did = true;
+            }
+            else if (calc[1] == Portal.Side.Left)
+            {
+                this.transform.rotation = target.transform.rotation * Quaternion.Euler(0, 0, 90);
+                transform.position = target.position + target.TransformDirection(offset);
+
+                did = true;
+            }
+            else if (calc[1] == Portal.Side.Bottom)
+            {
+                this.transform.rotation = target.transform.rotation * Quaternion.Euler(0, 0, 180);
+                transform.position = target.position + target.TransformDirection(offset);
+
+                did = true;
+            }
         }
-        else if (calc == Portal.Side.Right)
-        {
-
-        }*/
         if (!did)
         {
             if (target != null)

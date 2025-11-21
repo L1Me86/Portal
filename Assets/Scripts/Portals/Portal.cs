@@ -88,21 +88,50 @@ public class Portal : MonoBehaviour
                     GhostMovement.calc[0] = Side.Default;
                 }
             }
+
+
+
             if (other.CompareTag("PortalTrigger"))
             {
                 if ((other.gameObject.name == "PortalTriggerLeft" && this.side == Side.Right) || (other.gameObject.name == "PortalTriggerRight" && this.side == Side.Left) || (other.gameObject.name == "PortalTriggerBott" && this.side == Side.Top) || (other.gameObject.name == "PortalTriggerTop" && this.side == Side.Bottom))
                 {
-                    other.GetComponentInParent<CapsuleCollider2D>().gameObject.transform.position += range;
+                    if (((this.side == Side.Right || this.side == Side.Left) && (this.linkedPortal.side == Side.Right || this.linkedPortal.side == Side.Left)) || (this.side == Side.Bottom && this.linkedPortal.side == Side.Top) )
+                    {
+                        other.GetComponentInParent<CapsuleCollider2D>().gameObject.transform.position += range;
+                    }
                     if ((this.side == Side.Right || this.side == Side.Left) && this.linkedPortal.side == Side.Bottom)
                     {
+                        other.GetComponentInParent<CapsuleCollider2D>().gameObject.transform.position += range;
                         other.GetComponentInParent<Rigidbody2D>().velocity = Vector2.up * 15f;
                     }
-                    Debug.Log($"Portal at {linkedPortal.transform.position} | Teleported at: {other.transform.position}");
+                    if ((this.side == Side.Right || this.side == Side.Left) && this.linkedPortal.side == Side.Top)
+                    {
+                        other.GetComponentInParent<CapsuleCollider2D>().gameObject.transform.position += range + Vector3.right * 0.11f * (this.side == Side.Left ? 1 : -1);
+                    }
+                    if (this.side == Side.Bottom)
+                    {
+                        if (this.linkedPortal.side == Side.Bottom) 
+                        {
+                            other.GetComponentInParent<CapsuleCollider2D>().gameObject.transform.position += range - new Vector3(other.GetComponentInParent<CapsuleCollider2D>().gameObject.transform.position.x - this.transform.position.x, 0f) + Vector3.up * 0.01f;
+                            Vector2 newVelocity = other.GetComponentInParent<Rigidbody2D>().velocity;
+                            newVelocity.y *= -1;
+                            other.GetComponentInParent<Rigidbody2D>().velocity = newVelocity;
+                        }
+                        if (this.linkedPortal.side == Side.Right || side == Side.Left)
+                        {
+                            other.GetComponentInParent<CapsuleCollider2D>().gameObject.transform.position += range;
+                        }
+                        
+                    }
+                    Debug.Log($"Portal at {this.linkedPortal.transform.position} | Teleported at: {other.transform.position}");
                 }
             }
+
+
+
             if (!string.IsNullOrEmpty(other.tag) && other.tag.StartsWith("PortalWallTrigger"))
             {
-                if (other.tag.Length > 17 && other.tag[17] == 'V')
+                if (other.tag.Substring(17, 1) == "V")
                     activeVerticalTriggers.Add(other.gameObject);
                 else
                 {
@@ -178,12 +207,61 @@ public class Portal : MonoBehaviour
 
                     GhostMovement.offset = adjustedOffset;
                 }
-                else if (this.linkedPortal.side == Side.Right)
+                else if (this.linkedPortal.side == this.side)
                 {
                     float offset = this.transform.position.x - other.transform.position.x;
                     GhostMovement.offset = new Vector3(range.x + 2f * offset, range.y);
                 }
             }
+            else if (this.side == Side.Left) 
+            {
+                if (this.linkedPortal.side == Side.Top)
+                {
+                    float offset = (this.transform.position.x - other.transform.position.x);
+
+                    Vector3 adjustedOffset = new Vector3(range.x + offset, range.y - offset);
+
+                    GhostMovement.offset = adjustedOffset;
+                }
+                else if (this.linkedPortal.side == Side.Bottom)
+                {
+                    float offset = (this.transform.position.x - other.transform.position.x);
+
+                    Vector3 adjustedOffset = new Vector3(range.x + offset, range.y + offset);
+
+                    GhostMovement.offset = adjustedOffset;
+                }
+                else if (this.linkedPortal.side == this.side)
+                {
+                    float offset = this.transform.position.x - other.transform.position.x;
+                    GhostMovement.offset = new Vector3(range.x + 2f * offset, range.y);
+                }
+            }
+            else if (this.side == Side.Bottom)
+            {
+                if (this.linkedPortal.side == Side.Right)
+                {
+                    Vector3 offset = this.transform.position - other.transform.position;
+
+                    Vector3 adjustedOffset = new Vector3(range.x + offset.x - offset.y, range.y + offset.y);
+
+                    GhostMovement.offset = adjustedOffset;
+                }
+                else if (this.linkedPortal.side == Side.Left)
+                {
+                    Vector3 offset = this.transform.position - other.transform.position;
+
+                    Vector3 adjustedOffset = new Vector3(range.x - offset.x + offset.y, range.y + offset.y);
+
+                    GhostMovement.offset = adjustedOffset;
+                }
+                else if (this.linkedPortal.side == this.side)
+                {
+                    Vector3 offset = this.transform.position - other.transform.position;
+                    GhostMovement.offset = new Vector3(range.x + offset.x, range.y + 2f * offset.y);
+                }
+            }
+
         }
     }
 

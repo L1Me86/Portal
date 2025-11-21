@@ -13,6 +13,7 @@ public class PlayerMovement : MonoBehaviour
     public bool facingRight = true;
     public float moveInput;
     public float currentSpeed;
+    public float jumpHeight = 0;
 
     private float accelerationTimer;
     private bool isGrounded;
@@ -49,6 +50,16 @@ public class PlayerMovement : MonoBehaviour
         rb.gravityScale = gravityScale;
 
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+
+        if (!isGrounded)
+        {
+            if (rb.position.y > jumpHeight)
+                jumpHeight = rb.position.y;
+        }
+        else
+        {
+            jumpHeight = 0;
+        }
 
         if (Input.GetButtonDown("Jump") && isGrounded)
             Jump();
