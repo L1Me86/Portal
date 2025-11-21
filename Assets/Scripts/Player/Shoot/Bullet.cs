@@ -14,12 +14,13 @@ public class Bullet : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        Collider2D hitCollider = collision.collider;
-        Transform current = hitCollider.transform;
+        Transform current = collision.collider.transform;
+        bool placed = false;
 
         while (current != null)
         {
-            if (current.tag.Length >= 13 && current.tag.Substring(0, 13) == "PortalSurface")
+            string t = current.tag;
+            if (!string.IsNullOrEmpty(t) && t.StartsWith("PortalSurface"))
             {
                 Vector2 hitPoint = collision.GetContact(0).point;
 
@@ -27,7 +28,7 @@ public class Bullet : MonoBehaviour
                 Portal newPortal = portalObj.GetComponent<Portal>();
                 newPortal.isBlue = isBluePortal;
                 
-                switch (current.tag)
+                switch (t)
                 {
                     case "PortalSurfaceRight":
                         newPortal.side = Portal.Side.Right;
@@ -40,11 +41,11 @@ public class Bullet : MonoBehaviour
                         newPortal.transform.Rotate(0, 0, 90);
                         break;
                     case "PortalSurfaceUp":
-                        newPortal.side = Portal.Side.Up;
+                        newPortal.side = Portal.Side.Top;
                         newPortal.transform.Rotate(0, 0, 90);
                         break;
                     default:
-                        Debug.LogError("!!! Untagged surface portal creating attempt");
+                        Debug.LogError("!!! Untagged surface portal creating attempt" + t);
                         break;
                 }
 
@@ -59,7 +60,6 @@ public class Bullet : MonoBehaviour
                     }
                 }
 
-                Debug.Log($"Portal created at {hitPoint} | Scale: {portalObj.transform.localScale}");
 
                 Portal opposite = GunController.GetOppositePortal(isBluePortal);
                 if (opposite != null)
@@ -69,19 +69,18 @@ public class Bullet : MonoBehaviour
 
                 GunController.SetActivePortal(isBluePortal, newPortal);
 
-                Destroy(gameObject);
-                return;
-            }
-            else
-            {
-                Destroy(gameObject);
+                placed = true;
+                break;
             }
             current = current.parent;
         }
+        Destroy(gameObject);
     }
 
     private void OnBecameInvisible()
     {
         Destroy(gameObject);
     }
+
+
 }

@@ -7,6 +7,7 @@ public class GhostMovement : MonoBehaviour
 {
     public Transform target;
     static public Vector3 offset;
+    public static Portal.Side[] calc = new Portal.Side[2];
     public Transform head;
     public bool facingRight = true;
     public GameObject targetObject;
@@ -29,14 +30,36 @@ public class GhostMovement : MonoBehaviour
 
     void Update()
     {
-        if (target != null)
+        if (calc != null && calc[0] == Portal.Side.Right)
         {
-            transform.position = target.position + target.TransformDirection(offset);
-            transform.rotation = target.rotation;
-        }
+            if (calc[1] == Portal.Side.Top)
+            {
+                this.transform.rotation = target.transform.rotation * Quaternion.Euler(0, 0, -90);
+                transform.position = target.position + target.TransformDirection(offset);
+            }
+        }/*
+        else if (calc == Portal.Side.Bottom)
+        {
 
-        head.localScale = playerMovement.head.localScale;
-        
+        }
+        else if (calc == Portal.Side.Left)
+        {
+
+        }
+        else if (calc == Portal.Side.Right)
+        {
+
+        }*/
+        else
+        {
+            if (target != null)
+            {
+                transform.position = target.position + target.TransformDirection(offset);
+                transform.rotation = target.rotation;
+            }
+
+            head.localScale = playerMovement.head.localScale;
+        }
     }
 
 

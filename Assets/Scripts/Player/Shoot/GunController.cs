@@ -36,19 +36,31 @@ public class GunController : MonoBehaviour
 
     public static void SetActivePortal(bool isBlue, Portal portal)
     {
-        if (isBlue && bluePortal != null)
+        if (isBlue)
         {
-            bluePortal.Unlink();
-            Destroy(bluePortal.gameObject);
-        }
-        if (!isBlue && orangePortal != null)
-        {
-            orangePortal.Unlink();
-            Destroy(orangePortal.gameObject);
-        }
+            if (bluePortal != null)
+            {
+                bluePortal.Unlink();
+                Destroy(bluePortal.gameObject);
+            }
 
-        if (isBlue) bluePortal = portal;
-        else orangePortal = portal;
+            bluePortal = portal;
+        }
+        else
+        {
+            if (orangePortal != null)
+            {
+                orangePortal.Unlink();
+                Destroy(orangePortal.gameObject);
+            }
+
+            orangePortal = portal;
+        }
+    }
+
+    public static Portal GetActivePortal(bool isBlue)
+    {
+        return isBlue ? bluePortal : orangePortal;
     }
 
     public static Portal GetOppositePortal(bool isBlue)
