@@ -14,6 +14,8 @@ TagManager:
   - PortalSurfaceBott
   - PortalSurfaceUp
   - PortalWallTriggerVertical
+  - Bullet
+  - LaserReceiver
   layers:
   - Default
   - TransparentFX
