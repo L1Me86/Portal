@@ -30,12 +30,15 @@ public class GhostMovement : MonoBehaviour
 
     void Update()
     {
+        bool did = false;
         if (calc != null && calc[0] == Portal.Side.Right)
         {
-            if (calc[1] == Portal.Side.Top)
+            if (calc[1] == Portal.Side.Top || calc[1] == Portal.Side.Bottom)
             {
                 this.transform.rotation = target.transform.rotation * Quaternion.Euler(0, 0, -90);
                 transform.position = target.position + target.TransformDirection(offset);
+
+                did = true;
             }
         }/*
         else if (calc == Portal.Side.Bottom)
@@ -50,7 +53,7 @@ public class GhostMovement : MonoBehaviour
         {
 
         }*/
-        else
+        if (!did)
         {
             if (target != null)
             {

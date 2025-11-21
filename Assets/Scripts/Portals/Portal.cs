@@ -93,6 +93,10 @@ public class Portal : MonoBehaviour
                 if ((other.gameObject.name == "PortalTriggerLeft" && this.side == Side.Right) || (other.gameObject.name == "PortalTriggerRight" && this.side == Side.Left) || (other.gameObject.name == "PortalTriggerBott" && this.side == Side.Top) || (other.gameObject.name == "PortalTriggerTop" && this.side == Side.Bottom))
                 {
                     other.GetComponentInParent<CapsuleCollider2D>().gameObject.transform.position += range;
+                    if ((this.side == Side.Right || this.side == Side.Left) && this.linkedPortal.side == Side.Bottom)
+                    {
+                        other.GetComponentInParent<Rigidbody2D>().velocity = Vector2.up * 15f;
+                    }
                     Debug.Log($"Portal at {linkedPortal.transform.position} | Teleported at: {other.transform.position}");
                 }
             }
@@ -177,7 +181,7 @@ public class Portal : MonoBehaviour
                 else if (this.linkedPortal.side == Side.Right)
                 {
                     float offset = this.transform.position.x - other.transform.position.x;
-                    GhostMovement.offset = new Vector3(range.x + 2 * offset, range.y);
+                    GhostMovement.offset = new Vector3(range.x + 2f * offset, range.y);
                 }
             }
         }
