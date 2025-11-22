@@ -18,6 +18,7 @@ public class PlayerMovement : MonoBehaviour
     private float accelerationTimer;
     private bool isGrounded;
     private Rigidbody2D rb;
+    private Vector2 addedVelocity;
 
     [Header("Cube Pickup")]
     public Transform cubeHoldPoint;
@@ -92,6 +93,11 @@ public class PlayerMovement : MonoBehaviour
         {
             Flip();
         }
+
+        if (addedVelocity != Vector2.zero)
+        {
+            rb.position += addedVelocity * Time.fixedDeltaTime;
+        }
     }
 
     public void Flip()
@@ -159,5 +165,21 @@ public class PlayerMovement : MonoBehaviour
         }
 
         canPickup = true;
+    }
+
+    private void OnCollisionStay2D(Collision2D col)
+    {
+        if (col.collider.CompareTag("MovablePlatform"))
+        {
+            MovingPlatform plat = col.collider.GetComponent<MovingPlatform>();
+            if (plat != null)
+            {
+                addedVelocity = plat.platformVelocity;
+            }
+        }
+        else
+        {
+            addedVelocity = Vector2.zero;
+        }
     }
 }
