@@ -9,7 +9,8 @@ public class Cube : MonoBehaviour
 
     private Rigidbody2D rb;
     private Collider2D col;
-    private bool wasTrigger; 
+    private bool wasTrigger;
+    private Vector2 addedVelocity;
 
     void Start()
     {
@@ -59,5 +60,21 @@ public class Cube : MonoBehaviour
 
         transform.SetParent(null);
         holder = null;
+    }
+
+    private void OnCollisionEnter2D(Collision2D col)
+    {
+        if (col.collider.CompareTag("Player"))
+        {
+            col.collider.transform.SetParent(transform);
+        }
+    }
+
+    private void OnCollisionExit2D(Collision2D col)
+    {
+        if (col.collider.CompareTag("Player"))
+        {
+            col.collider.transform.SetParent(null);
+        }
     }
 }
