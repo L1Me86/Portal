@@ -15,7 +15,8 @@ public class Portal : MonoBehaviour
         Left,
         Right,
         Bottom,
-        Up
+        Top,
+        Default
     }
     public Side side;
 
@@ -56,50 +57,79 @@ public class Portal : MonoBehaviour
     {
         linkedPortal = otherPortal;
         otherPortal.linkedPortal = this;
+        Debug.Log($"{name} -> linked to -> {otherPortal.name}");
     }
 
     public void Unlink()
     {
         if (linkedPortal != null)
         {
-            linkedPortal.linkedPortal = null;
+            if (linkedPortal.linkedPortal == this)
+                linkedPortal.linkedPortal = null;
+
+            Debug.Log($"{name} -> unlinked from -> {linkedPortal.name}");
             linkedPortal = null;
         }
     }
 
+
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (linkedPortal != null)
+        if (this.linkedPortal != null)
         {
-            range = linkedPortal.transform.position - this.transform.position;
+            range = this.linkedPortal.transform.position - this.transform.position;
             if (other.CompareTag("Player"))
             {
-                /*
-                if (((this.side == Side.Right) || (this.side == Side.Left)) && ((this.linkedPortal.side == Side.Right) || (this.linkedPortal.side == Side.Left)))
-                    GhostMovement.offset = range;
-                else
+                GhostMovement.calc[0] = this.side;
+                GhostMovement.calc[1] = this.linkedPortal.side;
+                if ((this.side == Side.Left && this.linkedPortal.side == Side.Right) || (this.side == Side.Right && this.linkedPortal.side == Side.Left) || (this.side == Side.Top && this.linkedPortal.side == Side.Bottom) || (this.side == Side.Bottom && this.linkedPortal.side == Side.Top))
                 {
-                    if (this.side == Side.Right)
-                    {
-                        if (linkedPortal.side == Side.Up)
-                        {
-                            GhostMovement.offset = range;
-
-                        }
-                    }
+                    GhostMovement.offset = range;
+                    GhostMovement.calc[0] = Side.Default;
                 }
-                */
-                GhostMovement.offset = range;
             }
+
+
+
             if (other.CompareTag("PortalTrigger"))
             {
-                if ((other.gameObject.name == "PortalTriggerLeft" && this.side == Side.Right) || (other.gameObject.name == "PortalTriggerRight" && this.side == Side.Left) || (other.gameObject.name == "PortalTriggerTop" && this.side == Side.Bottom) || (other.gameObject.name == "PortalTriggerTop" && this.side == Side.Up))
+                if ((other.gameObject.name == "PortalTriggerLeft" && this.side == Side.Right) || (other.gameObject.name == "PortalTriggerRight" && this.side == Side.Left) || (other.gameObject.name == "PortalTriggerBott" && this.side == Side.Top) || (other.gameObject.name == "PortalTriggerTop" && this.side == Side.Bottom))
                 {
-                    other.GetComponentInParent<CapsuleCollider2D>().gameObject.transform.position += range;
-                    Debug.Log($"Portal at {linkedPortal.transform.position} | Teleported at: {other.transform.position}");
+                    if (((this.side == Side.Right || this.side == Side.Left) && (this.linkedPortal.side == Side.Right || this.linkedPortal.side == Side.Left)) || (this.side == Side.Bottom && this.linkedPortal.side == Side.Top) )
+                    {
+                        other.GetComponentInParent<CapsuleCollider2D>().gameObject.transform.position += range;
+                    }
+                    if ((this.side == Side.Right || this.side == Side.Left) && this.linkedPortal.side == Side.Bottom)
+                    {
+                        other.GetComponentInParent<CapsuleCollider2D>().gameObject.transform.position += range;
+                        other.GetComponentInParent<Rigidbody2D>().velocity = Vector2.up * 15f;
+                    }
+                    if ((this.side == Side.Right || this.side == Side.Left) && this.linkedPortal.side == Side.Top)
+                    {
+                        other.GetComponentInParent<CapsuleCollider2D>().gameObject.transform.position += range + Vector3.right * 0.11f * (this.side == Side.Left ? 1 : -1);
+                    }
+                    if (this.side == Side.Bottom)
+                    {
+                        if (this.linkedPortal.side == Side.Bottom) 
+                        {
+                            other.GetComponentInParent<CapsuleCollider2D>().gameObject.transform.position += range - new Vector3(other.GetComponentInParent<CapsuleCollider2D>().gameObject.transform.position.x - this.transform.position.x, 0f) + Vector3.up * 0.01f;
+                            Vector2 newVelocity = other.GetComponentInParent<Rigidbody2D>().velocity;
+                            newVelocity.y *= -1;
+                            other.GetComponentInParent<Rigidbody2D>().velocity = newVelocity;
+                        }
+                        if (this.linkedPortal.side == Side.Right || side == Side.Left)
+                        {
+                            other.GetComponentInParent<CapsuleCollider2D>().gameObject.transform.position += range;
+                        }
+                        
+                    }
+                    Debug.Log($"Portal at {this.linkedPortal.transform.position} | Teleported at: {other.transform.position}");
                 }
             }
-            if (other.tag.Length > 18 && other.tag.Substring(0, 17) == "PortalWallTrigger")
+
+
+
+            if (!string.IsNullOrEmpty(other.tag) && other.tag.StartsWith("PortalWallTrigger"))
             {
                 if (other.tag.Substring(17, 1) == "V")
                     activeVerticalTriggers.Add(other.gameObject);
@@ -108,7 +138,7 @@ public class Portal : MonoBehaviour
                     activeHorizontalTriggers.Add(other.gameObject);
                     Debug.Log(other.tag);
                 }
-                    
+
 
                 if ((activeVerticalTriggers.Count == 2) || (activeHorizontalTriggers.Count == 2))
                 {
@@ -124,7 +154,7 @@ public class Portal : MonoBehaviour
                         case Side.Bottom:
                             walltag = "PortalSurfaceBott";
                             break;
-                        case Side.Up:
+                        case Side.Top:
                             walltag = "PortalSurfaceUp";
                             break;
                         default:
@@ -154,11 +184,95 @@ public class Portal : MonoBehaviour
         }
     }
 
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        if (GhostMovement.calc[0] != Side.Default && other.name == "RealPlayer")
+        { 
+            Vector3 range = this.linkedPortal.transform.position - this.transform.position;
+            if (this.side == Side.Right)
+            {
+                if (this.linkedPortal.side == Side.Top)
+                {
+                    float offset = (this.transform.position.x - other.transform.position.x);
+
+                    Vector3 adjustedOffset = new Vector3(range.x + offset, range.y + offset);
+
+                    GhostMovement.offset = adjustedOffset;
+                }
+                else if (this.linkedPortal.side == Side.Bottom)
+                {
+                    float offset = (this.transform.position.x - other.transform.position.x);
+
+                    Vector3 adjustedOffset = new Vector3(range.x + offset, range.y - offset);
+
+                    GhostMovement.offset = adjustedOffset;
+                }
+                else if (this.linkedPortal.side == this.side)
+                {
+                    float offset = this.transform.position.x - other.transform.position.x;
+                    GhostMovement.offset = new Vector3(range.x + 2f * offset, range.y);
+                }
+            }
+            else if (this.side == Side.Left) 
+            {
+                if (this.linkedPortal.side == Side.Top)
+                {
+                    float offset = (this.transform.position.x - other.transform.position.x);
+
+                    Vector3 adjustedOffset = new Vector3(range.x + offset, range.y - offset);
+
+                    GhostMovement.offset = adjustedOffset;
+                }
+                else if (this.linkedPortal.side == Side.Bottom)
+                {
+                    float offset = (this.transform.position.x - other.transform.position.x);
+
+                    Vector3 adjustedOffset = new Vector3(range.x + offset, range.y + offset);
+
+                    GhostMovement.offset = adjustedOffset;
+                }
+                else if (this.linkedPortal.side == this.side)
+                {
+                    float offset = this.transform.position.x - other.transform.position.x;
+                    GhostMovement.offset = new Vector3(range.x + 2f * offset, range.y);
+                }
+            }
+            else if (this.side == Side.Bottom)
+            {
+                if (this.linkedPortal.side == Side.Right)
+                {
+                    Vector3 offset = this.transform.position - other.transform.position;
+
+                    Vector3 adjustedOffset = new Vector3(range.x + offset.x - offset.y, range.y + offset.y);
+
+                    GhostMovement.offset = adjustedOffset;
+                }
+                else if (this.linkedPortal.side == Side.Left)
+                {
+                    Vector3 offset = this.transform.position - other.transform.position;
+
+                    Vector3 adjustedOffset = new Vector3(range.x - offset.x + offset.y, range.y + offset.y);
+
+                    GhostMovement.offset = adjustedOffset;
+                }
+                else if (this.linkedPortal.side == this.side)
+                {
+                    Vector3 offset = this.transform.position - other.transform.position;
+                    GhostMovement.offset = new Vector3(range.x + offset.x, range.y + 2f * offset.y);
+                }
+            }
+
+        }
+    }
+
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        if (other.CompareTag("Player") && linkedPortal != null)
+        if (other.CompareTag("Player") && this.linkedPortal != null)
+        {
             GhostMovement.offset = Vector3.up * 25;
+            GhostMovement.calc[0] = Side.Default;
+        }
         if (other.tag.Length > 17 && other.tag.Substring(0, 17) == "PortalWallTrigger")
         {
             if (other.tag.Substring(17, 1) == "V")
@@ -180,7 +294,7 @@ public class Portal : MonoBehaviour
                     case Side.Bottom:
                         walltag = "PortalSurfaceBott";
                         break;
-                    case Side.Up:
+                    case Side.Top:
                         walltag = "PortalSurfaceUp";
                         break;
                     default:
@@ -208,8 +322,4 @@ public class Portal : MonoBehaviour
             }
         }
     }
-
-
-
-
 }
