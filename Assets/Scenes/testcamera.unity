@@ -702,7 +702,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.01, y: 1.7}
+  m_Size: {x: 0.01, y: 1.85}
   m_EdgeRadius: 0
 --- !u!1 &58271760
 GameObject:
@@ -6410,6 +6410,12 @@ MonoBehaviour:
   cubeHoldPoint: {fileID: 553214622}
   pickupRange: 4
   pickupKey: 304
+  airSpeed: 3
+  groundFriction: 0.9
+  airDeceleration: 0.1
+  groundDeceleration: 50
+  maxGroundSpeed: 8
+  maxAirSpeed: 100
 --- !u!70 &579026103
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -6442,8 +6448,8 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.000000029802322, y: -0.007}
-  m_Size: {x: 0.86510175, y: 1.6919365}
+  m_Offset: {x: 0, y: 0}
+  m_Size: {x: 0.86, y: 1.7}
   m_Direction: 0
 --- !u!1 &679624722
 GameObject:
@@ -15875,7 +15881,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.01, y: 1.7}
+  m_Size: {x: 0.01, y: 1.85}
   m_EdgeRadius: 0
 --- !u!1 &1725989166
 GameObject:
@@ -16686,7 +16692,7 @@ Transform:
   m_GameObject: {fileID: 1768624845}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 36.98, y: 5.63, z: -10.428753}
+  m_LocalPosition: {x: 31.45, y: 4, z: -10.428753}
   m_LocalScale: {x: 1.0327, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

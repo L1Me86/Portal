@@ -3,7 +3,7 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     public float moveSpeed = 5f;
-    public float accelerationTime = 0.5f;
+    public float accelerationTime = 0.2f;
     public Transform head;
     public float jumpForce = 7f;
     public float gravityScale = 3f;
@@ -19,6 +19,8 @@ public class PlayerMovement : MonoBehaviour
     private bool isGrounded;
     private Rigidbody2D rb;
     private Vector2 addedVelocity;
+    private bool justTeleported = false;
+    private int teleportFrames = 3;
 
     [Header("Cube Pickup")]
     public Transform cubeHoldPoint;
@@ -27,6 +29,16 @@ public class PlayerMovement : MonoBehaviour
 
     private Cube carriedCube;
     private bool canPickup = true;
+
+    [Header("Air Control")]
+    public float airSpeed = 3f;
+    public float groundFriction = 0.9f;
+    public float airDeceleration = 0.5f;
+    public float groundDeceleration = 50f;
+
+    [Header("Speed Limits")]
+    public float maxGroundSpeed = 20f;
+    public float maxAirSpeed = 100f;
 
 
     void Start()
@@ -37,7 +49,7 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        moveInput = Input.GetAxis("Horizontal");
+        moveInput = Input.GetAxisRaw("Horizontal");
 
         if (moveInput != 0)
         {
@@ -65,8 +77,7 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetButtonDown("Jump") && isGrounded)
             Jump();
 
-        float accelerationProgress = Mathf.Clamp01(accelerationTimer / accelerationTime);
-        currentSpeed = Mathf.Lerp(0, moveSpeed, accelerationProgress);
+        currentSpeed = moveSpeed;
 
         if (Input.GetKeyDown(pickupKey))
         {
@@ -83,7 +94,29 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        rb.velocity = new Vector2(moveInput * currentSpeed, rb.velocity.y);
+        if (justTeleported)
+        {
+            teleportFrames--;
+            if (teleportFrames <= 0) justTeleported = false;
+            return;
+        }
+
+        float targetSpeed = moveInput * moveSpeed;
+        float accel = isGrounded ? 20f : 10f;
+
+        float newX = Mathf.Lerp(rb.velocity.x, targetSpeed, accel * Time.fixedDeltaTime);
+
+        if (moveInput == 0)
+        {
+            float decel = isGrounded ? groundDeceleration : airDeceleration;
+
+            newX = Mathf.Lerp(newX, 0, decel * Time.fixedDeltaTime);
+        }
+
+        float maxSpeed = isGrounded ? maxGroundSpeed : maxAirSpeed;
+        newX = Mathf.Clamp(newX, -maxSpeed, maxSpeed);
+
+        rb.velocity = new Vector2(newX, rb.velocity.y);
 
         if (facingRight == false && moveInput > 0)
         {
@@ -141,6 +174,11 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    public void JustTeleported()
+    {
+        justTeleported = true;
+        teleportFrames = 2;
+    }
     void PickupCube(Cube cube)
     {
         carriedCube = cube;
