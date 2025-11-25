@@ -5783,7 +5783,7 @@ Transform:
   m_GameObject: {fileID: 553214621}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3.07, y: -0.123, z: -8.049665}
+  m_LocalPosition: {x: 0.789, y: -0.123, z: -8.049665}
   m_LocalScale: {x: 0.61622155, y: 0.61622155, z: 0.61622155}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6419,7 +6419,7 @@ CapsuleCollider2D:
   m_GameObject: {fileID: 579026096}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 5b36016452a6c494e86cdede876214d4, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -6442,8 +6442,8 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.000000029802322, y: -0.007}
-  m_Size: {x: 0.86510175, y: 1.6919365}
+  m_Offset: {x: 0, y: 0}
+  m_Size: {x: 0.86, y: 1.7}
   m_Direction: 0
 --- !u!1 &679624722
 GameObject:
@@ -6474,8 +6474,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1175838724}
-  - {fileID: 1768624846}
   - {fileID: 94432385}
   - {fileID: 423477703}
   - {fileID: 1478701401}
@@ -8839,8 +8837,8 @@ Transform:
   m_GameObject: {fileID: 1049178484}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3.179, y: -4.2445, z: 382.96378}
-  m_LocalScale: {x: 0.651236, y: 0.02825597, z: 0.02825597}
+  m_LocalPosition: {x: -2.73, y: -4.2445, z: 382.96378}
+  m_LocalScale: {x: 0.1790899, y: 0.02825597, z: 0.02825597}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1775736720}
@@ -9886,14 +9884,14 @@ Transform:
   m_GameObject: {fileID: 1175838722}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 39.25404, y: -3.1412878, z: 0}
+  m_LocalPosition: {x: 4.696495, y: 12.468491, z: 10.428753}
   m_LocalScale: {x: 1.1579993, y: 0.12792337, z: 0.61993}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1041491517}
   - {fileID: 224672683}
   - {fileID: 1541362702}
-  m_Father: {fileID: 679624723}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &1175838725
 BoxCollider2D:
@@ -16686,11 +16684,11 @@ Transform:
   m_GameObject: {fileID: 1768624845}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 36.98, y: 5.63, z: -10.428753}
+  m_LocalPosition: {x: 2.4224548, y: 21.239779, z: 0}
   m_LocalScale: {x: 1.0327, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 679624723}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1768624847
 SpriteRenderer:
@@ -16753,7 +16751,7 @@ BoxCollider2D:
   m_GameObject: {fileID: 1768624845}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 5b36016452a6c494e86cdede876214d4, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -16925,7 +16923,7 @@ Transform:
   m_GameObject: {fileID: 1783368154}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 10.542, y: -4.246, z: 382.96378}
+  m_LocalPosition: {x: -0.74, y: -4.246, z: 382.96378}
   m_LocalScale: {x: 0.028204475, y: 0.028204475, z: 0.028204475}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -18966,6 +18964,7 @@ MonoBehaviour:
   firePoint: {fileID: 553214622}
   bulletPrefab: {fileID: 659509049048605097, guid: ba38161f150f1644ea26142833b97dc2, type: 3}
   bulletSpeed: 50
+  playerCollider: {fileID: 579026103}
   blueColor: {r: 0.663, g: 0.588, b: 1, a: 1}
   orangeColor: {r: 1, g: 0.68, b: 0.36, a: 1}
 --- !u!1 &1984972895
@@ -20618,10 +20617,12 @@ SceneRoots:
   - {fileID: 1237834131}
   - {fileID: 519420032}
   - {fileID: 946907680}
+  - {fileID: 319318142}
   - {fileID: 1459662045}
   - {fileID: 679624723}
   - {fileID: 1183704054}
   - {fileID: 822019929}
+  - {fileID: 1175838724}
+  - {fileID: 1768624846}
   - {fileID: 1448044588}
-  - {fileID: 319318142}
   - {fileID: 1780420399}
