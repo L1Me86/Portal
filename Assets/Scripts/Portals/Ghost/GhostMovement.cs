@@ -28,7 +28,7 @@ public class GhostMovement : MonoBehaviour
         }
     }
 
-    void Update()
+    void FixedUpdate()
     {
         bool did = false;
         if (calc != null && (calc[0] == Portal.Side.Right || calc[0] == Portal.Side.Left))
@@ -76,6 +76,4 @@ public class GhostMovement : MonoBehaviour
             head.localScale = playerMovement.head.localScale;
         }
     }
-
-
 }
