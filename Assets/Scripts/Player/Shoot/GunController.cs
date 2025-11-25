@@ -7,6 +7,7 @@ public class GunController : MonoBehaviour
     public Transform firePoint;
     public GameObject bulletPrefab;
     public float bulletSpeed = 100f;
+    public Collider2D playerCollider;
 
     public Color blueColor = new Color(0.663f, 0.588f, 1f);
     public Color orangeColor = new Color(1f, 0.68f, 0.36f);
@@ -27,6 +28,7 @@ public class GunController : MonoBehaviour
 
         Bullet bulletScript = bullet.GetComponent<Bullet>();
         bulletScript.setPortalType(isBlue);
+        bulletScript.playerCollider = playerCollider;
 
         bullet.GetComponent<SpriteRenderer>().color = isBlue ? blueColor : orangeColor;
 

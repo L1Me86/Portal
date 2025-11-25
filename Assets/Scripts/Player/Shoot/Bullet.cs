@@ -5,7 +5,15 @@ using UnityEngine;
 public class Bullet : MonoBehaviour
 {
     public GameObject portalPrefab;
+    public Collider2D playerCollider;
+
     private bool isBluePortal = true;
+
+    void Start()
+    {
+        Collider2D bulletCol = GetComponent<Collider2D>();
+        Physics2D.IgnoreCollision(bulletCol, playerCollider);
+    }
 
     public void setPortalType(bool isBlue)
     {
@@ -82,6 +90,4 @@ public class Bullet : MonoBehaviour
     {
         Destroy(gameObject);
     }
-
-
 }

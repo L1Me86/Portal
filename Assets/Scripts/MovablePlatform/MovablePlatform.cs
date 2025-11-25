@@ -24,7 +24,10 @@ public class MovingPlatform : MonoBehaviour
         if (button.isPressed) {
             MovePlatform();
             CalculateVelocity();
-        } 
+        }
+        else {
+            platformVelocity = Vector2.zero;
+        }
     }
 
     void MovePlatform()

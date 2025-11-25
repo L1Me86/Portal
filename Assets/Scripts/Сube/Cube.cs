@@ -61,20 +61,4 @@ public class Cube : MonoBehaviour
         transform.SetParent(null);
         holder = null;
     }
-
-    private void OnCollisionEnter2D(Collision2D col)
-    {
-        if (col.collider.CompareTag("Player"))
-        {
-            col.collider.transform.SetParent(transform);
-        }
-    }
-
-    private void OnCollisionExit2D(Collision2D col)
-    {
-        if (col.collider.CompareTag("Player"))
-        {
-            col.collider.transform.SetParent(null);
-        }
-    }
 }
