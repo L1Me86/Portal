@@ -228,7 +228,7 @@ public class Portal : MonoBehaviour
                         newPos = this.linkedPortal.transform.position + new Vector3(0f, triggerCollider.transform.localPosition.y, 0f);
                         break;
                     case Side.Left:
-                        newPos = this.linkedPortal.transform.position - new Vector3(playerObj.transform.Find("PortalTriggerLeft").localPosition.x, 0f, 0f) + new Vector3(1, 0);
+                        newPos = this.linkedPortal.transform.position - new Vector3(playerObj.transform.Find("PortalTriggerLeft").localPosition.x, 0f, 0f);
                         break;
                     default:
                         newPos = Vector3.zero; break;

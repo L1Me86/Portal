@@ -183,6 +183,7 @@ public class PlayerMovement : MonoBehaviour
     {
         carriedCube = cube;
         cube.PickUp(cubeHoldPoint);
+        cube.transform.rotation = cubeHoldPoint.transform.parent.parent.rotation;
         canPickup = false;
     }
 
@@ -204,7 +205,7 @@ public class PlayerMovement : MonoBehaviour
 
         canPickup = true;
     }
-
+    /*
     private void OnCollisionStay2D(Collision2D col)
     {
         if (col.collider.CompareTag("MovablePlatform"))
@@ -219,5 +220,5 @@ public class PlayerMovement : MonoBehaviour
         {
             addedVelocity = Vector2.zero;
         }
-    }
+    }*/
 }
