@@ -29,9 +29,15 @@ public class Bullet : MonoBehaviour
         string t = collider.tag;
         if (!string.IsNullOrEmpty(t) && t.StartsWith("PortalSurface"))
         {
-            UnityEngine.Vector2 closestPointOnOther = collider.ClosestPoint(transform.position);
-            UnityEngine.Vector2 closestPointOnSelf = GetComponent<Collider2D>().ClosestPoint(collider.transform.position);
-            UnityEngine.Vector2 hitPoint = (closestPointOnOther + closestPointOnSelf) / 2f;
+            UnityEngine.Vector2 hitPoint;
+            if (t == "PortalSurfaceRight" || t == "PortalSurfaceLeft")
+            {
+                hitPoint = new UnityEngine.Vector2(collider.transform.position.x + ((collider as BoxCollider2D).size.x / 2f) * (t == "PortalSurfaceLeft" ? 1 : -1), this.transform.position.y);
+            }
+            else
+            {
+                hitPoint = new UnityEngine.Vector2(this.transform.position.x, collider.transform.position.y + (collider as BoxCollider2D).size.y / 2f * (t == "PortalSurfaceBott" ? 1 : -1));
+            }
 
             GameObject portalObj = Instantiate(portalPrefab, hitPoint, UnityEngine.Quaternion.identity);
             Portal newPortal = portalObj.GetComponent<Portal>();
