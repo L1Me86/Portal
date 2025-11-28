@@ -222,10 +222,10 @@ public class Portal : MonoBehaviour
                         newPos = this.linkedPortal.transform.position - new Vector3(playerObj.transform.Find("PortalTriggerRight").localPosition.x, 0f, 0f);
                         break;
                     case Side.Top:
-                        newPos = this.linkedPortal.transform.position - new Vector3(0f, triggerCollider.transform.localPosition.y, 0f);
+                        newPos = this.linkedPortal.transform.position;
                         break;
                     case Side.Bottom:
-                        newPos = this.linkedPortal.transform.position + new Vector3(0f, triggerCollider.transform.localPosition.y, 0f);
+                        newPos = this.linkedPortal.transform.position;
                         break;
                     case Side.Left:
                         newPos = this.linkedPortal.transform.position - new Vector3(playerObj.transform.Find("PortalTriggerLeft").localPosition.x, 0f, 0f);
@@ -241,10 +241,10 @@ public class Portal : MonoBehaviour
                         newPos = this.linkedPortal.transform.position - new Vector3(playerObj.transform.Find("PortalTriggerRight").localPosition.x, 0f, 0f);
                         break;
                     case Side.Top:
-                        newPos = this.linkedPortal.transform.position + new Vector3(0f, triggerCollider.transform.localPosition.y, 0f);
+                        newPos = this.linkedPortal.transform.position;
                         break;
                     case Side.Bottom:
-                        newPos = this.linkedPortal.transform.position - new Vector3(0f, triggerCollider.transform.localPosition.y, 0f);
+                        newPos = this.linkedPortal.transform.position + new Vector3(0f, MathF.Abs(triggerCollider.transform.localPosition.y), 0f);
                         break;
                     case Side.Left:
                         newPos = this.linkedPortal.transform.position - new Vector3(playerObj.transform.Find("PortalTriggerLeft").localPosition.x, 0f, 0f);
@@ -295,6 +295,7 @@ public class Portal : MonoBehaviour
             if (GhostMovement.calc[1] == Side.Bottom)
             {
                 newVelocity.y = -oldVelocity.y;
+                newVelocity.x = 0f;
             }
             else if (GhostMovement.calc[1] == Side.Left)
             {
@@ -502,7 +503,7 @@ public class Portal : MonoBehaviour
                 {
                     Vector3 offset = this.transform.position - other.transform.position;
 
-                    Vector3 adjustedOffset = new Vector3(range.x - offset.x + offset.y, range.y + offset.y);
+                    Vector3 adjustedOffset = new Vector3(range.x + offset.x - MathF.Abs(offset.y), range.y + offset.y);
 
                     GhostMovement.offset = adjustedOffset;
                 }
@@ -512,7 +513,30 @@ public class Portal : MonoBehaviour
                     GhostMovement.offset = new Vector3(range.x + offset.x, range.y + 2f * offset.y);
                 }
             }
+            else if (this.side == Side.Top)
+            {
+                if (this.linkedPortal.side == Side.Right)
+                {
+                    Vector3 offset = this.transform.position - other.transform.position;
 
+                    Vector3 adjustedOffset = new Vector3(range.x + offset.x + MathF.Abs(offset.y), range.y + MathF.Abs(offset.y));
+
+                    GhostMovement.offset = adjustedOffset;
+                }
+                else if (this.linkedPortal.side == Side.Left)
+                {
+                    Vector3 offset = this.transform.position - other.transform.position;
+
+                    Vector3 adjustedOffset = new Vector3(range.x + offset.x - MathF.Abs(offset.y), range.y + MathF.Abs(offset.y));
+
+                    GhostMovement.offset = adjustedOffset;
+                }
+                else if (this.linkedPortal.side == this.side)
+                {
+                    Vector3 offset = this.transform.position - other.transform.position;
+                    GhostMovement.offset = new Vector3(range.x + offset.x, range.y + 2f * offset.y);
+                }
+            }
         }
     }
 
@@ -548,6 +572,8 @@ public class Portal : MonoBehaviour
                 Debug.Log("Wall phasing DISABLED");
             }
         }
-        unlock = true;
+        if (other.CompareTag("Player"))
+            unlock = true;
+
     }
 }
