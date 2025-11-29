@@ -29,6 +29,7 @@ public class GunController : MonoBehaviour
         Bullet bulletScript = bullet.GetComponent<Bullet>();
         bulletScript.setPortalType(isBlue);
         bulletScript.playerCollider = playerCollider;
+        bulletScript.player = playerCollider.gameObject;
 
         bullet.GetComponent<SpriteRenderer>().color = isBlue ? blueColor : orangeColor;
 

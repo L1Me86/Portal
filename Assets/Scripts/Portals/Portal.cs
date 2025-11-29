@@ -112,10 +112,17 @@ public class Portal : MonoBehaviour
         }
 
         List<Collider2D> cols = new List<Collider2D>();
-        GameObject[] walls = GameObject.FindGameObjectsWithTag(walltag);
-        foreach (GameObject wall in walls)
+        GameObject[] triggerChildren = GameObject.FindGameObjectsWithTag(walltag);
+        HashSet<GameObject> uniqueWalls = new HashSet<GameObject>();
+
+        foreach (GameObject trigger in triggerChildren)
         {
-            cols.AddRange(wall.GetComponentsInChildren<Collider2D>());
+            GameObject wallParent = trigger.transform.parent?.gameObject;
+
+            if (wallParent != null && uniqueWalls.Add(wallParent))
+            {
+                cols.AddRange(wallParent.GetComponentsInChildren<Collider2D>());
+            }
         }
         return cols.ToArray();
     }
@@ -222,10 +229,10 @@ public class Portal : MonoBehaviour
                         newPos = this.linkedPortal.transform.position - new Vector3(playerObj.transform.Find("PortalTriggerRight").localPosition.x, 0f, 0f);
                         break;
                     case Side.Top:
-                        newPos = this.linkedPortal.transform.position - new Vector3(0f, triggerCollider.transform.localPosition.y, 0f);
+                        newPos = this.linkedPortal.transform.position;
                         break;
                     case Side.Bottom:
-                        newPos = this.linkedPortal.transform.position + new Vector3(0f, triggerCollider.transform.localPosition.y, 0f);
+                        newPos = this.linkedPortal.transform.position;
                         break;
                     case Side.Left:
                         newPos = this.linkedPortal.transform.position - new Vector3(playerObj.transform.Find("PortalTriggerLeft").localPosition.x, 0f, 0f);
@@ -241,10 +248,10 @@ public class Portal : MonoBehaviour
                         newPos = this.linkedPortal.transform.position - new Vector3(playerObj.transform.Find("PortalTriggerRight").localPosition.x, 0f, 0f);
                         break;
                     case Side.Top:
-                        newPos = this.linkedPortal.transform.position + new Vector3(0f, triggerCollider.transform.localPosition.y, 0f);
+                        newPos = this.linkedPortal.transform.position;
                         break;
                     case Side.Bottom:
-                        newPos = this.linkedPortal.transform.position - new Vector3(0f, triggerCollider.transform.localPosition.y, 0f);
+                        newPos = this.linkedPortal.transform.position + new Vector3(0f, MathF.Abs(triggerCollider.transform.localPosition.y), 0f);
                         break;
                     case Side.Left:
                         newPos = this.linkedPortal.transform.position - new Vector3(playerObj.transform.Find("PortalTriggerLeft").localPosition.x, 0f, 0f);
@@ -295,6 +302,7 @@ public class Portal : MonoBehaviour
             if (GhostMovement.calc[1] == Side.Bottom)
             {
                 newVelocity.y = -oldVelocity.y;
+                newVelocity.x = 0f;
             }
             else if (GhostMovement.calc[1] == Side.Left)
             {
@@ -387,45 +395,21 @@ public class Portal : MonoBehaviour
 
                 if ((activeVerticalTriggers.Count == 2) || (activeHorizontalTriggers.Count == 2))
                 {
-                    string walltag;
-                    switch (this.side)
+                    Collider2D[] walscols = GetWallCollidersBySide(this.side);
+
+                    GameObject playerObj = other.transform.parent != null
+                            ? other.transform.parent.gameObject
+                            : other.GetComponentInParent<Collider2D>()?.gameObject;
+
+                    Collider2D playerCollider = playerObj != null
+                                                ? playerObj.GetComponent<Collider2D>()
+                                                : other.GetComponentInParent<Collider2D>();
+
+                    foreach (Collider2D wallCol in walscols)
                     {
-                        case Side.Right:
-                            walltag = "PortalSurfaceRight";
-                            break;
-                        case Side.Left:
-                            walltag = "PortalSurfaceLeft";
-                            break;
-                        case Side.Bottom:
-                            walltag = "PortalSurfaceBott";
-                            break;
-                        case Side.Top:
-                            walltag = "PortalSurfaceUp";
-                            break;
-                        default:
-                            walltag = "PortalSurface";
-                            Debug.LogError("Wrong Wall Tag");
-                            break;
-                    }
-                    GameObject[] walls = GameObject.FindGameObjectsWithTag(walltag);
-
-                    foreach (GameObject wall in walls)
-                    {
-                        Collider2D[] wallColliders = wall.GetComponentsInChildren<Collider2D>();
-                        GameObject playerObj = other.transform.parent != null
-                               ? other.transform.parent.gameObject
-                               : other.GetComponentInParent<Collider2D>()?.gameObject;
-
-                        Collider2D playerCollider = playerObj != null
-                                                    ? playerObj.GetComponent<Collider2D>()
-                                                    : other.GetComponentInParent<Collider2D>();
-
-                        foreach (Collider2D wallCol in wallColliders)
+                        if (wallCol != null && playerCollider != null)
                         {
-                            if (wallCol != null && playerCollider != null)
-                            {
-                                Physics2D.IgnoreCollision(playerCollider, wallCol, true);
-                            }
+                            Physics2D.IgnoreCollision(playerCollider, wallCol, true);
                         }
                     }
 
@@ -502,7 +486,7 @@ public class Portal : MonoBehaviour
                 {
                     Vector3 offset = this.transform.position - other.transform.position;
 
-                    Vector3 adjustedOffset = new Vector3(range.x - offset.x + offset.y, range.y + offset.y);
+                    Vector3 adjustedOffset = new Vector3(range.x + offset.x - MathF.Abs(offset.y), range.y + offset.y);
 
                     GhostMovement.offset = adjustedOffset;
                 }
@@ -512,7 +496,30 @@ public class Portal : MonoBehaviour
                     GhostMovement.offset = new Vector3(range.x + offset.x, range.y + 2f * offset.y);
                 }
             }
+            else if (this.side == Side.Top)
+            {
+                if (this.linkedPortal.side == Side.Right)
+                {
+                    Vector3 offset = this.transform.position - other.transform.position;
 
+                    Vector3 adjustedOffset = new Vector3(range.x + offset.x + MathF.Abs(offset.y), range.y + MathF.Abs(offset.y));
+
+                    GhostMovement.offset = adjustedOffset;
+                }
+                else if (this.linkedPortal.side == Side.Left)
+                {
+                    Vector3 offset = this.transform.position - other.transform.position;
+
+                    Vector3 adjustedOffset = new Vector3(range.x + offset.x - MathF.Abs(offset.y), range.y + MathF.Abs(offset.y));
+
+                    GhostMovement.offset = adjustedOffset;
+                }
+                else if (this.linkedPortal.side == this.side)
+                {
+                    Vector3 offset = this.transform.position - other.transform.position;
+                    GhostMovement.offset = new Vector3(range.x + offset.x, range.y + 2f * offset.y);
+                }
+            }
         }
     }
 
@@ -526,7 +533,7 @@ public class Portal : MonoBehaviour
             GhostMovement.offset = Vector3.up * 25;
         }
 
-        if (!string.IsNullOrEmpty(other.tag) && other.tag.Length > 17 && other.tag.Substring(0, 17) == "PortalWallTrigger" && unlock)
+        if (!string.IsNullOrEmpty(other.tag) && other.tag.Length > 17 && other.tag.StartsWith("PortalWallTrigger") && unlock)
         {
             if (other.tag.Substring(17, 1) == "V")
                 activeVerticalTriggers.Remove(other.gameObject);
@@ -548,6 +555,7 @@ public class Portal : MonoBehaviour
                 Debug.Log("Wall phasing DISABLED");
             }
         }
-        unlock = true;
+        if (other.CompareTag("Player"))
+            unlock = true;
     }
 }
