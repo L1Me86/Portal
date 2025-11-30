@@ -12,6 +12,10 @@ public class MovingPlatform : MonoBehaviour
 
     private Vector3 targetPoint;
     private Vector3 lastPosition;
+    private Cube cube;
+
+    private HashSet<Rigidbody2D> riders = new HashSet<Rigidbody2D>();
+    private Dictionary<Transform, Transform> originalParents = new Dictionary<Transform, Transform>();
 
     private void Start()
     {
@@ -19,23 +23,35 @@ public class MovingPlatform : MonoBehaviour
         lastPosition = transform.position;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
-        if (button.isPressed) {
-            MovePlatform();
-            CalculateVelocity();
+        if (button != null && button.isPressed)
+        {
+            MovePlatformFixed();
         }
-        else {
-            platformVelocity = Vector2.zero;
+
+        Vector3 displacement = transform.position - lastPosition;
+
+        if (displacement != Vector3.zero)
+        {
+            foreach (var rb in riders)
+            {
+                if (rb == null) continue;
+                rb.MovePosition(rb.position + (Vector2)displacement);
+            }
         }
+
+        lastPosition = transform.position;
     }
 
-    void MovePlatform()
+    void MovePlatformFixed()
     {
+        if (pointA == null || pointB == null) return;
+
         transform.position = Vector3.MoveTowards(
             transform.position,
             targetPoint,
-            speed * Time.deltaTime
+            speed * Time.fixedDeltaTime
         );
 
         if (Vector3.Distance(transform.position, targetPoint) < 0.05f)
@@ -44,9 +60,54 @@ public class MovingPlatform : MonoBehaviour
         }
     }
 
-    void CalculateVelocity()
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        platformVelocity = (transform.position - lastPosition) / Time.deltaTime;
-        lastPosition = transform.position;
+        if (collision == null) return;
+
+        var colTransform = collision.transform;
+
+        if (colTransform.CompareTag("Player"))
+        {
+            if (!originalParents.ContainsKey(colTransform))
+                originalParents[colTransform] = colTransform.parent;
+
+            colTransform.SetParent(transform, true);
+            return;
+        }
+
+        var rb = collision.rigidbody;
+        if (rb == null) return;
+
+        if (rb.gameObject.CompareTag("Cube"))
+        {
+            var cube = rb.GetComponent<Cube>();
+            if (cube == null || cube.isPickedUp) return;
+            riders.Add(rb);
+        }
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision == null) return;
+
+        var colTransform = collision.transform;
+
+        if (colTransform.CompareTag("Player"))
+        {
+            if (originalParents.TryGetValue(colTransform, out var origParent))
+            {
+                colTransform.SetParent(origParent, true);
+                originalParents.Remove(colTransform);
+            }
+            else
+            {
+                colTransform.SetParent(null, true);
+            }
+            return;
+        }
+
+        var rb = collision.rigidbody;
+        if (rb != null)
+            riders.Remove(rb);
     }
 }

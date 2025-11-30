@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditor.Build;
 using UnityEngine;
 using UnityEngine.SocialPlatforms;
@@ -10,6 +12,7 @@ public class Portal : MonoBehaviour
     public bool isBlue = true;
     public static HashSet<GameObject> activeVerticalTriggers = new HashSet<GameObject>();
     public static HashSet<GameObject> activeHorizontalTriggers = new HashSet<GameObject>();
+    private bool unlock = true;
     public enum Side
     {
         Left,
@@ -72,6 +75,283 @@ public class Portal : MonoBehaviour
         }
     }
 
+    private void ReenableWallCollisionsForPlayer(GameObject player, Collider2D[] wallCols)
+    {
+        if (player == null) return;
+
+        Collider2D playerCollider = player.GetComponent<Collider2D>();
+        if (playerCollider == null) return;
+
+        foreach (var w in wallCols)
+        {
+            if (w == null) continue;
+            Physics2D.IgnoreCollision(playerCollider, w, false);
+        }
+    }
+
+    private Collider2D[] GetWallCollidersBySide(Side side)
+    {
+        string walltag;
+        switch (side)
+        {
+            case Side.Right:
+                walltag = "PortalSurfaceRight";
+                break;
+            case Side.Left:
+                walltag = "PortalSurfaceLeft";
+                break;
+            case Side.Bottom:
+                walltag = "PortalSurfaceBott";
+                break;
+            case Side.Top:
+                walltag = "PortalSurfaceUp";
+                break;
+            default:
+                walltag = "PortalSurface";
+                break;
+        }
+
+        List<Collider2D> cols = new List<Collider2D>();
+        GameObject[] triggerChildren = GameObject.FindGameObjectsWithTag(walltag);
+        HashSet<GameObject> uniqueWalls = new HashSet<GameObject>();
+
+        foreach (GameObject trigger in triggerChildren)
+        {
+            GameObject wallParent = trigger.transform.parent?.gameObject;
+
+            if (wallParent != null && uniqueWalls.Add(wallParent))
+            {
+                cols.AddRange(wallParent.GetComponentsInChildren<Collider2D>());
+            }
+        }
+        return cols.ToArray();
+    }
+
+
+    private IEnumerator ReenableWallsAfterFixed(GameObject player, Collider2D[] wallCols)
+    {
+        yield return new WaitForFixedUpdate();
+
+        ReenableWallCollisionsForPlayer(player, wallCols);
+    }
+    private IEnumerator ApplyVelocityAfterFixed(Rigidbody2D rb, Vector2 velocity)
+    {
+        yield return new WaitForFixedUpdate();
+        yield return new WaitForFixedUpdate();
+        if (rb != null)
+        {
+            rb.velocity = velocity; Debug.Log($"Velocity after apply in coroutine: {rb.velocity}");
+        }
+    }
+
+
+
+
+    private void TeleportPlayer(Collider2D triggerCollider)
+    {
+        if (triggerCollider == null || this.linkedPortal == null) return;
+
+        GameObject playerObj = triggerCollider.transform.parent != null
+                               ? triggerCollider.transform.parent.gameObject
+                               : triggerCollider.GetComponentInParent<Collider2D>()?.gameObject;
+
+
+        if (playerObj == null) return;
+
+
+        Collider2D[] playerColliders = playerObj.GetComponentsInChildren<Collider2D>();
+        if (playerColliders == null || playerColliders.Length == 0) return;
+
+        Rigidbody2D rb = playerObj.GetComponent<Rigidbody2D>();
+
+        Collider2D[] destWalls = GetWallCollidersBySide(this.linkedPortal.side);
+
+        foreach (var pcol in playerColliders)
+        {
+            if (pcol == null) continue;
+            foreach (var w in destWalls)
+            {
+                if (w == null) continue;
+                Physics2D.IgnoreCollision(pcol, w, true);
+            }
+        }
+
+        var playerParentCapsule = triggerCollider.GetComponentInParent<CapsuleCollider2D>();
+
+        Vector2 oldVelocity = rb.velocity;
+
+        Vector3 newPos;
+
+        switch (GhostMovement.calc[0])
+        {
+            case Side.Left:
+                switch (GhostMovement.calc[1])
+                {
+                    case Side.Right:
+                        newPos = this.linkedPortal.transform.position - new Vector3(triggerCollider.transform.localPosition.x, 0f, 0f);
+                        break;
+                    case Side.Top:
+                        newPos = this.linkedPortal.transform.position;
+                        break;
+                    case Side.Bottom:
+                        newPos = this.linkedPortal.transform.position;
+                        break;
+                    case Side.Left:
+                        newPos = this.linkedPortal.transform.position + new Vector3(triggerCollider.transform.localPosition.x, 0f, 0f);
+                        break;
+                    default:
+                        newPos = Vector3.zero; break;
+                }
+                break;
+            case Side.Right:
+                switch (GhostMovement.calc[1])
+                {
+                    case Side.Right:
+                        newPos = this.linkedPortal.transform.position + new Vector3(triggerCollider.transform.localPosition.x, 0f, 0f);
+                        break;
+                    case Side.Top:
+                        newPos = this.linkedPortal.transform.position;
+                        break;
+                    case Side.Bottom:
+                        newPos = this.linkedPortal.transform.position;
+                        break;
+                    case Side.Left:
+                        newPos = this.linkedPortal.transform.position - new Vector3(triggerCollider.transform.localPosition.x, 0f, 0f);
+                        break;
+                    default:
+                        newPos = Vector3.zero; break;
+                }
+                break;
+            case Side.Bottom:
+                switch (GhostMovement.calc[1])
+                {
+                    case Side.Right:
+                        newPos = this.linkedPortal.transform.position - new Vector3(playerObj.transform.Find("PortalTriggerRight").localPosition.x, 0f, 0f);
+                        break;
+                    case Side.Top:
+                        newPos = this.linkedPortal.transform.position;
+                        break;
+                    case Side.Bottom:
+                        newPos = this.linkedPortal.transform.position;
+                        break;
+                    case Side.Left:
+                        newPos = this.linkedPortal.transform.position - new Vector3(playerObj.transform.Find("PortalTriggerLeft").localPosition.x, 0f, 0f);
+                        break;
+                    default:
+                        newPos = Vector3.zero; break;
+                }
+                break;
+            case Side.Top:
+                switch (GhostMovement.calc[1])
+                {
+                    case Side.Right:
+                        newPos = this.linkedPortal.transform.position - new Vector3(playerObj.transform.Find("PortalTriggerRight").localPosition.x, 0f, 0f);
+                        break;
+                    case Side.Top:
+                        newPos = this.linkedPortal.transform.position;
+                        break;
+                    case Side.Bottom:
+                        newPos = this.linkedPortal.transform.position + new Vector3(0f, MathF.Abs(triggerCollider.transform.localPosition.y), 0f);
+                        break;
+                    case Side.Left:
+                        newPos = this.linkedPortal.transform.position - new Vector3(playerObj.transform.Find("PortalTriggerLeft").localPosition.x, 0f, 0f);
+                        break;
+                    default:
+                        newPos = Vector3.zero; break;
+                }
+                break;
+            default:
+                newPos = Vector3.zero; break;
+
+        }
+
+
+        if (rb != null)
+        {
+            rb.position = newPos;
+            Physics2D.SyncTransforms();
+        }
+
+        Vector2 newVelocity = oldVelocity;
+
+
+        if (GhostMovement.calc[0] == Side.Left)
+        {
+            if (GhostMovement.calc[1] == Side.Bottom)
+            {
+                newVelocity.y = Mathf.Abs(oldVelocity.x) + 10f;
+            }
+            else if (GhostMovement.calc[1] == Side.Left)
+            {
+                newVelocity.x = -oldVelocity.x;
+            }
+        }
+        else if (GhostMovement.calc[0] == Side.Right)
+        {
+            if (GhostMovement.calc[1] == Side.Bottom)
+            {
+                newVelocity.y = Mathf.Abs(oldVelocity.x) + 10f;
+            }
+            else if (GhostMovement.calc[1] == Side.Right)
+            {
+                newVelocity.x = -oldVelocity.x;
+            }
+        }
+        else if (GhostMovement.calc[0] == Side.Bottom)
+        {
+            if (GhostMovement.calc[1] == Side.Bottom)
+            {
+                newVelocity.y = -oldVelocity.y;
+                newVelocity.x = 0f;
+            }
+            else if (GhostMovement.calc[1] == Side.Left)
+            {
+                newVelocity.x = -oldVelocity.y;
+                newVelocity.y = 0;
+            }
+            else if (GhostMovement.calc[1] == Side.Right)
+            {
+                newVelocity.x = oldVelocity.y;
+                newVelocity.y = 0;
+            }
+        }
+        else if (GhostMovement.calc[0] == Side.Top)
+        {
+            if (GhostMovement.calc[1] == Side.Top)
+            {
+                newVelocity.y = -oldVelocity.y;
+            }
+            else if (GhostMovement.calc[1] == Side.Left)
+            {
+                newVelocity.x = oldVelocity.y;
+                newVelocity.y = 0;
+            }
+            else if (GhostMovement.calc[1] == Side.Right)
+            {
+                newVelocity.x = -oldVelocity.y;
+                newVelocity.y = 0;
+            }
+        }
+
+
+        PlayerMovement pMovement = playerObj.GetComponent<PlayerMovement>();
+        if (pMovement != null)
+        {
+            pMovement.JustTeleported();
+        }
+
+
+        StartCoroutine(ApplyVelocityAfterFixed(rb, newVelocity));
+
+        if (this.side != this.linkedPortal.side)
+        {
+            StartCoroutine(ReenableWallsAfterFixed(playerObj, GetWallCollidersBySide(this.side)));
+        }
+        else
+        {
+            unlock = false;
+        }
+    }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -85,7 +365,6 @@ public class Portal : MonoBehaviour
                 if ((this.side == Side.Left && this.linkedPortal.side == Side.Right) || (this.side == Side.Right && this.linkedPortal.side == Side.Left) || (this.side == Side.Top && this.linkedPortal.side == Side.Bottom) || (this.side == Side.Bottom && this.linkedPortal.side == Side.Top))
                 {
                     GhostMovement.offset = range;
-                    GhostMovement.calc[0] = Side.Default;
                 }
             }
 
@@ -95,35 +374,9 @@ public class Portal : MonoBehaviour
             {
                 if ((other.gameObject.name == "PortalTriggerLeft" && this.side == Side.Right) || (other.gameObject.name == "PortalTriggerRight" && this.side == Side.Left) || (other.gameObject.name == "PortalTriggerBott" && this.side == Side.Top) || (other.gameObject.name == "PortalTriggerTop" && this.side == Side.Bottom))
                 {
-                    if (((this.side == Side.Right || this.side == Side.Left) && (this.linkedPortal.side == Side.Right || this.linkedPortal.side == Side.Left)) || (this.side == Side.Bottom && this.linkedPortal.side == Side.Top) )
-                    {
-                        other.GetComponentInParent<CapsuleCollider2D>().gameObject.transform.position += range;
-                    }
-                    if ((this.side == Side.Right || this.side == Side.Left) && this.linkedPortal.side == Side.Bottom)
-                    {
-                        other.GetComponentInParent<CapsuleCollider2D>().gameObject.transform.position += range;
-                        other.GetComponentInParent<Rigidbody2D>().velocity = Vector2.up * 15f;
-                    }
-                    if ((this.side == Side.Right || this.side == Side.Left) && this.linkedPortal.side == Side.Top)
-                    {
-                        other.GetComponentInParent<CapsuleCollider2D>().gameObject.transform.position += range + Vector3.right * 0.11f * (this.side == Side.Left ? 1 : -1);
-                    }
-                    if (this.side == Side.Bottom)
-                    {
-                        if (this.linkedPortal.side == Side.Bottom) 
-                        {
-                            other.GetComponentInParent<CapsuleCollider2D>().gameObject.transform.position += range - new Vector3(other.GetComponentInParent<CapsuleCollider2D>().gameObject.transform.position.x - this.transform.position.x, 0f) + Vector3.up * 0.01f;
-                            Vector2 newVelocity = other.GetComponentInParent<Rigidbody2D>().velocity;
-                            newVelocity.y *= -1;
-                            other.GetComponentInParent<Rigidbody2D>().velocity = newVelocity;
-                        }
-                        if (this.linkedPortal.side == Side.Right || side == Side.Left)
-                        {
-                            other.GetComponentInParent<CapsuleCollider2D>().gameObject.transform.position += range;
-                        }
-                        
-                    }
+                    TeleportPlayer(other);
                     Debug.Log($"Portal at {this.linkedPortal.transform.position} | Teleported at: {other.transform.position}");
+                    Debug.Log($"Unlock {unlock}");
                 }
             }
 
@@ -142,39 +395,21 @@ public class Portal : MonoBehaviour
 
                 if ((activeVerticalTriggers.Count == 2) || (activeHorizontalTriggers.Count == 2))
                 {
-                    string walltag;
-                    switch (this.side)
-                    {
-                        case Side.Right:
-                            walltag = "PortalSurfaceRight";
-                            break;
-                        case Side.Left:
-                            walltag = "PortalSurfaceLeft";
-                            break;
-                        case Side.Bottom:
-                            walltag = "PortalSurfaceBott";
-                            break;
-                        case Side.Top:
-                            walltag = "PortalSurfaceUp";
-                            break;
-                        default:
-                            walltag = "PortalSurface";
-                            Debug.LogError("Wrong Wall Tag");
-                            break;
-                    }
-                    GameObject[] walls = GameObject.FindGameObjectsWithTag(walltag);
+                    Collider2D[] walscols = GetWallCollidersBySide(this.side);
 
-                    foreach (GameObject wall in walls)
+                    GameObject playerObj = other.transform.parent != null
+                            ? other.transform.parent.gameObject
+                            : other.GetComponentInParent<Collider2D>()?.gameObject;
+
+                    Collider2D playerCollider = playerObj != null
+                                                ? playerObj.GetComponent<Collider2D>()
+                                                : other.GetComponentInParent<Collider2D>();
+
+                    foreach (Collider2D wallCol in walscols)
                     {
-                        Collider2D[] wallColliders = wall.GetComponentsInChildren<Collider2D>();
-                        Collider2D playerCollider = other.GetComponentInParent<Collider2D>();
-                        foreach (Collider2D wallCol in wallColliders)
+                        if (wallCol != null && playerCollider != null)
                         {
-                            wallCol.enabled = false;
-                            if (wallCol != null && playerCollider != null)
-                            {
-                                Physics2D.IgnoreCollision(playerCollider, wallCol, true);
-                            }
+                            Physics2D.IgnoreCollision(playerCollider, wallCol, true);
                         }
                     }
 
@@ -251,7 +486,7 @@ public class Portal : MonoBehaviour
                 {
                     Vector3 offset = this.transform.position - other.transform.position;
 
-                    Vector3 adjustedOffset = new Vector3(range.x - offset.x + offset.y, range.y + offset.y);
+                    Vector3 adjustedOffset = new Vector3(range.x + offset.x - MathF.Abs(offset.y), range.y + offset.y);
 
                     GhostMovement.offset = adjustedOffset;
                 }
@@ -261,19 +496,44 @@ public class Portal : MonoBehaviour
                     GhostMovement.offset = new Vector3(range.x + offset.x, range.y + 2f * offset.y);
                 }
             }
+            else if (this.side == Side.Top)
+            {
+                if (this.linkedPortal.side == Side.Right)
+                {
+                    Vector3 offset = this.transform.position - other.transform.position;
 
+                    Vector3 adjustedOffset = new Vector3(range.x + offset.x + MathF.Abs(offset.y), range.y + MathF.Abs(offset.y));
+
+                    GhostMovement.offset = adjustedOffset;
+                }
+                else if (this.linkedPortal.side == Side.Left)
+                {
+                    Vector3 offset = this.transform.position - other.transform.position;
+
+                    Vector3 adjustedOffset = new Vector3(range.x + offset.x - MathF.Abs(offset.y), range.y + MathF.Abs(offset.y));
+
+                    GhostMovement.offset = adjustedOffset;
+                }
+                else if (this.linkedPortal.side == this.side)
+                {
+                    Vector3 offset = this.transform.position - other.transform.position;
+                    GhostMovement.offset = new Vector3(range.x + offset.x, range.y + 2f * offset.y);
+                }
+            }
         }
     }
 
 
     private void OnTriggerExit2D(Collider2D other)
     {
+        if (other == null) return;
+
         if (other.CompareTag("Player") && this.linkedPortal != null)
         {
             GhostMovement.offset = Vector3.up * 25;
-            GhostMovement.calc[0] = Side.Default;
         }
-        if (other.tag.Length > 17 && other.tag.Substring(0, 17) == "PortalWallTrigger")
+
+        if (!string.IsNullOrEmpty(other.tag) && other.tag.Length > 17 && other.tag.StartsWith("PortalWallTrigger") && unlock)
         {
             if (other.tag.Substring(17, 1) == "V")
                 activeVerticalTriggers.Remove(other.gameObject);
@@ -282,44 +542,20 @@ public class Portal : MonoBehaviour
 
             if (activeVerticalTriggers.Count < 2)
             {
-                string walltag;
-                switch (this.side)
-                {
-                    case Side.Right:
-                        walltag = "PortalSurfaceRight";
-                        break;
-                    case Side.Left:
-                        walltag = "PortalSurfaceLeft";
-                        break;
-                    case Side.Bottom:
-                        walltag = "PortalSurfaceBott";
-                        break;
-                    case Side.Top:
-                        walltag = "PortalSurfaceUp";
-                        break;
-                    default:
-                        walltag = "PortalSurface";
-                        Debug.LogError("Wrong Wall Tag");
-                        break;
-                }
-                GameObject[] walls = GameObject.FindGameObjectsWithTag(walltag);
+                GameObject playerObj = other.transform.parent != null
+                                       ? other.transform.parent.gameObject
+                                       : other.GetComponentInParent<Collider2D>()?.gameObject;
 
-                foreach (GameObject wall in walls)
+                if (playerObj != null)
                 {
-                    Collider2D[] wallColliders = wall.GetComponentsInChildren<Collider2D>();
-                    Collider2D playerCollider = other.GetComponentInParent<Collider2D>();
-                    foreach (Collider2D wallCol in wallColliders)
-                    {
-                        wallCol.enabled = true;
-                        if (wallCol != null && playerCollider != null)
-                        {
-                            Physics2D.IgnoreCollision(playerCollider, wallCol, false);
-                        }
-                    }
+                    Collider2D[] walls = GetWallCollidersBySide(this.side);
+                    ReenableWallCollisionsForPlayer(playerObj, walls);
                 }
 
                 Debug.Log("Wall phasing DISABLED");
             }
         }
+        if (other.CompareTag("Player"))
+            unlock = true;
     }
 }

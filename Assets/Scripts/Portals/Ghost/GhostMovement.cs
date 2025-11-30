@@ -28,7 +28,7 @@ public class GhostMovement : MonoBehaviour
         }
     }
 
-    void Update()
+    void FixedUpdate()
     {
         bool did = false;
         if (calc != null && (calc[0] == Portal.Side.Right || calc[0] == Portal.Side.Left))
@@ -65,6 +65,30 @@ public class GhostMovement : MonoBehaviour
                 did = true;
             }
         }
+        if (calc != null && (calc[0] == Portal.Side.Top))
+        {
+            if (calc[1] == Portal.Side.Right)
+            {
+                this.transform.rotation = target.transform.rotation * Quaternion.Euler(0, 0, 90);
+                transform.position = target.position + target.TransformDirection(offset);
+
+                did = true;
+            }
+            else if (calc[1] == Portal.Side.Left)
+            {
+                this.transform.rotation = target.transform.rotation * Quaternion.Euler(0, 0, -90);
+                transform.position = target.position + target.TransformDirection(offset);
+
+                did = true;
+            }
+            else if (calc[1] == Portal.Side.Top)
+            {
+                this.transform.rotation = target.transform.rotation * Quaternion.Euler(0, 0, 180);
+                transform.position = target.position + target.TransformDirection(offset);
+
+                did = true;
+            }
+        }
         if (!did)
         {
             if (target != null)
@@ -76,6 +100,4 @@ public class GhostMovement : MonoBehaviour
             head.localScale = playerMovement.head.localScale;
         }
     }
-
-
 }
