@@ -1,5 +1,6 @@
 using System.Numerics;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class Bullet : MonoBehaviour
 {
@@ -32,14 +33,16 @@ public class Bullet : MonoBehaviour
         float colliderSizeY = (collider as BoxCollider2D).size.y / 2f;
         float colliderSizeX = (collider as BoxCollider2D).size.x / 2f;
 
-        if (!string.IsNullOrEmpty(t) && t.StartsWith("Portal"))
+        if (!string.IsNullOrEmpty(t) && t.StartsWith("PortalSurface"))
         {
+            UnityEngine.Vector2 hitPoint;
+
             if (t.Equals("Portal"))
             {
                 collider = collider.GetComponent<Portal>().sitsOn;
                 t = collider.tag;
             }
-            UnityEngine.Vector2 hitPoint;
+
             if (t == "PortalSurfaceRight" || t == "PortalSurfaceLeft")
             {
                 float offsetY;
@@ -49,8 +52,8 @@ public class Bullet : MonoBehaviour
 
                 if (offsetY > colliderSizeY - portalSize)
                 {
-                    hitPoint += UnityEngine.Vector2.down * (Mathf.Sign(hitPoint.y - collider.transform.position.y) * (offsetY - (colliderSizeY - portalSize)));
-                    Debug.Log("portal moved");
+                    hitPoint.y = collider.transform.position.y + (colliderSizeY - portalSize) * Mathf.Sign(hitPoint.y - collider.transform.position.y);
+                    Debug.Log("portal moved" + hitPoint.ToString());
                 }
             }
             else
@@ -148,6 +151,10 @@ public class Bullet : MonoBehaviour
                     }
                 }
             }
+        }
+        else if (!string.IsNullOrEmpty(t) && t.Equals("Portal"))
+        {
+            Debug.Log("Hited Portal");
         }
         else
         {
