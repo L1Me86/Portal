@@ -17,6 +17,7 @@ TagManager:
   - Bullet
   - LaserReceiver
   - MovablePlatform
+  - NonPortalSurface
   layers:
   - Default
   - TransparentFX

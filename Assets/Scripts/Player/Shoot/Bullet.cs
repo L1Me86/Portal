@@ -16,6 +16,7 @@ public class Bullet : MonoBehaviour
         Collider2D[] playerColliders = player.GetComponentsInChildren<Collider2D>();
         foreach (Collider2D col in playerColliders)
             Physics2D.IgnoreCollision(bulletCol, col);
+        bulletCol.isTrigger = true;
     }
 
     public void setPortalType(bool isBlue)
@@ -30,13 +31,34 @@ public class Bullet : MonoBehaviour
         if (!string.IsNullOrEmpty(t) && t.StartsWith("PortalSurface"))
         {
             UnityEngine.Vector2 hitPoint;
+            float portalSize = (portalPrefab.GetComponent<Collider2D>() as BoxCollider2D).size.y / 2f;
             if (t == "PortalSurfaceRight" || t == "PortalSurfaceLeft")
             {
+                float colliderSize = (collider as BoxCollider2D).size.y / 2f;
+                float offsetY;
+
                 hitPoint = new UnityEngine.Vector2(collider.transform.position.x + ((collider as BoxCollider2D).size.x / 2f) * (t == "PortalSurfaceLeft" ? 1 : -1), this.transform.position.y);
+                offsetY = Mathf.Abs(hitPoint.y - collider.transform.position.y);
+
+                if (offsetY > colliderSize - portalSize)
+                {
+                    hitPoint += UnityEngine.Vector2.down * (Mathf.Sign(hitPoint.y - collider.transform.position.y) * (offsetY - (colliderSize - portalSize)));
+                    Debug.Log("portal moved");
+                }
             }
             else
             {
+                float colliderSize = (collider as BoxCollider2D).size.x / 2f;
+                float offsetX;
+
                 hitPoint = new UnityEngine.Vector2(this.transform.position.x, collider.transform.position.y + (collider as BoxCollider2D).size.y / 2f * (t == "PortalSurfaceBott" ? 1 : -1));
+                offsetX = Mathf.Abs(hitPoint.x - collider.transform.position.x);
+
+                if (offsetX > colliderSize - portalSize)
+                {
+                    hitPoint += UnityEngine.Vector2.left * (Mathf.Sign(hitPoint.x - collider.transform.position.x) * (offsetX - (colliderSize - portalSize)));
+                    Debug.Log("portal moved");
+                }
             }
 
             GameObject portalObj = Instantiate(portalPrefab, hitPoint, UnityEngine.Quaternion.identity);
