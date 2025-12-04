@@ -12,6 +12,7 @@ public class Portal : MonoBehaviour
     public bool isBlue = true;
     public static HashSet<GameObject> activeVerticalTriggers = new HashSet<GameObject>();
     public static HashSet<GameObject> activeHorizontalTriggers = new HashSet<GameObject>();
+    public Collider2D sitsOn;
     private bool unlock = true;
     public enum Side
     {
@@ -34,7 +35,6 @@ public class Portal : MonoBehaviour
 
         if (blueChild != null) blueChild.gameObject.SetActive(isBlue);
         if (orangeChild != null) orangeChild.gameObject.SetActive(!isBlue);
-
     }
 
     void CreateChildrenIfMissing()

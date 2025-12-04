@@ -28,35 +28,41 @@ public class Bullet : MonoBehaviour
     {
         Debug.Log(collider);
         string t = collider.tag;
-        if (!string.IsNullOrEmpty(t) && t.StartsWith("PortalSurface"))
+        float portalSize = (portalPrefab.GetComponent<Collider2D>() as BoxCollider2D).size.y / 2f;
+        float colliderSizeY = (collider as BoxCollider2D).size.y / 2f;
+        float colliderSizeX = (collider as BoxCollider2D).size.x / 2f;
+
+        if (!string.IsNullOrEmpty(t) && t.StartsWith("Portal"))
         {
+            if (t.Equals("Portal"))
+            {
+                collider = collider.GetComponent<Portal>().sitsOn;
+                t = collider.tag;
+            }
             UnityEngine.Vector2 hitPoint;
-            float portalSize = (portalPrefab.GetComponent<Collider2D>() as BoxCollider2D).size.y / 2f;
             if (t == "PortalSurfaceRight" || t == "PortalSurfaceLeft")
             {
-                float colliderSize = (collider as BoxCollider2D).size.y / 2f;
                 float offsetY;
 
                 hitPoint = new UnityEngine.Vector2(collider.transform.position.x + ((collider as BoxCollider2D).size.x / 2f) * (t == "PortalSurfaceLeft" ? 1 : -1), this.transform.position.y);
                 offsetY = Mathf.Abs(hitPoint.y - collider.transform.position.y);
 
-                if (offsetY > colliderSize - portalSize)
+                if (offsetY > colliderSizeY - portalSize)
                 {
-                    hitPoint += UnityEngine.Vector2.down * (Mathf.Sign(hitPoint.y - collider.transform.position.y) * (offsetY - (colliderSize - portalSize)));
+                    hitPoint += UnityEngine.Vector2.down * (Mathf.Sign(hitPoint.y - collider.transform.position.y) * (offsetY - (colliderSizeY - portalSize)));
                     Debug.Log("portal moved");
                 }
             }
             else
             {
-                float colliderSize = (collider as BoxCollider2D).size.x / 2f;
                 float offsetX;
 
                 hitPoint = new UnityEngine.Vector2(this.transform.position.x, collider.transform.position.y + (collider as BoxCollider2D).size.y / 2f * (t == "PortalSurfaceBott" ? 1 : -1));
                 offsetX = Mathf.Abs(hitPoint.x - collider.transform.position.x);
 
-                if (offsetX > colliderSize - portalSize)
+                if (offsetX > colliderSizeX - portalSize)
                 {
-                    hitPoint += UnityEngine.Vector2.left * (Mathf.Sign(hitPoint.x - collider.transform.position.x) * (offsetX - (colliderSize - portalSize)));
+                    hitPoint += UnityEngine.Vector2.left * (Mathf.Sign(hitPoint.x - collider.transform.position.x) * (offsetX - (colliderSizeX - portalSize)));
                     Debug.Log("portal moved");
                 }
             }
@@ -64,6 +70,7 @@ public class Bullet : MonoBehaviour
             GameObject portalObj = Instantiate(portalPrefab, hitPoint, UnityEngine.Quaternion.identity);
             Portal newPortal = portalObj.GetComponent<Portal>();
             newPortal.isBlue = isBluePortal;
+            newPortal.sitsOn = collider;
 
             switch (t)
             {
@@ -103,6 +110,43 @@ public class Bullet : MonoBehaviour
             if (opposite != null)
             {
                 newPortal.LinkTo(opposite);
+            }
+
+            if (newPortal.linkedPortal != null)
+            {
+                if (newPortal.sitsOn == newPortal.linkedPortal.sitsOn)
+                {
+                    if (newPortal.sitsOn.CompareTag("PortalSurfaceRight") || newPortal.sitsOn.CompareTag("PortalSurfaceLeft"))
+                    {
+                        if (Mathf.Abs(newPortal.transform.position.y - newPortal.linkedPortal.transform.position.y) < portalSize * 2f)
+                        {
+                            bool onTop = newPortal.transform.position.y - newPortal.linkedPortal.transform.position.y >= 0 ? true : false;
+                            if (Mathf.Abs(newPortal.linkedPortal.transform.position.y + (portalSize * 2f * (onTop ? 1 : -1)) - collider.transform.position.y) > colliderSizeY - portalSize)
+                            {
+                                newPortal.transform.position = newPortal.linkedPortal.transform.position + new UnityEngine.Vector3(0, -portalSize * 2f * (onTop ? 1 : -1));
+                            }
+                            else
+                            {
+                                newPortal.transform.position = newPortal.linkedPortal.transform.position + new UnityEngine.Vector3(0, portalSize * 2f * (onTop ? 1 : -1));
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (Mathf.Abs(newPortal.transform.position.x - newPortal.linkedPortal.transform.position.x) < portalSize * 2f)
+                        {
+                            bool onTop = newPortal.transform.position.x - newPortal.linkedPortal.transform.position.x >= 0 ? true : false;
+                            if (Mathf.Abs(newPortal.linkedPortal.transform.position.x + (portalSize * 2f * (onTop ? 1 : -1)) - collider.transform.position.x) > colliderSizeX - portalSize)
+                            {
+                                newPortal.transform.position = newPortal.linkedPortal.transform.position + new UnityEngine.Vector3(-portalSize * 2f * (onTop ? 1 : -1), 0);
+                            }
+                            else
+                            {
+                                newPortal.transform.position = newPortal.linkedPortal.transform.position + new UnityEngine.Vector3(portalSize * 2f * (onTop ? 1 : -1), 0);
+                            }
+                        }
+                    }
+                }
             }
         }
         else
