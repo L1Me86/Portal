@@ -1,7 +1,14 @@
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class PlayerMovement : MonoBehaviour
 {
+    public static PlayerMovement Instance { get; private set; }
+    [SerializeField] private Transform shoulder;
+    public Transform Shoulder => shoulder;
+
+    public Transform ghostFirePoint;
+
     public float moveSpeed = 5f;
     public float accelerationTime = 0.2f;
     public Transform head;
@@ -14,6 +21,9 @@ public class PlayerMovement : MonoBehaviour
     public float moveInput;
     public float currentSpeed;
     public float jumpHeight = 0;
+    public static bool isInPortal = false;
+    public static bool transformBulletToGhost = false;
+    public static Portal linked;
 
     private float accelerationTimer;
     private bool isGrounded;
@@ -28,7 +38,7 @@ public class PlayerMovement : MonoBehaviour
     public KeyCode pickupKey = KeyCode.E;
 
     private Cube carriedCube;
-    private bool canPickup = true;
+    public bool canPickup = true;
 
     [Header("Air Control")]
     public float airSpeed = 3f;
@@ -40,6 +50,23 @@ public class PlayerMovement : MonoBehaviour
     public float maxGroundSpeed = 20f;
     public float maxAirSpeed = 100f;
 
+    void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+
+        InitializeReferences();
+    }
+    void InitializeReferences()
+    {
+        if (shoulder == null) shoulder = transform.Find("Shoulder");
+    }
 
     void Start()
     {
@@ -204,6 +231,48 @@ public class PlayerMovement : MonoBehaviour
         }
 
         canPickup = true;
+    }
+
+    public static bool bulletTransform()
+    {
+        if (isInPortal)
+        {
+            switch (linked.side)
+            {
+                case Portal.Side.Left:
+                    if (Instance.ghostFirePoint.position.x > linked.transform.position.x)
+                    {
+                        transformBulletToGhost = true;
+                        return true;
+                    }
+                    break;
+                case Portal.Side.Right:
+                    if (Instance.ghostFirePoint.position.x < linked.transform.position.x)
+                    {
+                        transformBulletToGhost = true;
+                        return true;
+                    }
+                    break;
+                case Portal.Side.Top:
+                    if (Instance.ghostFirePoint.position.y < linked.transform.position.y)
+                    {
+                        transformBulletToGhost = true;
+                        return true;
+                    }
+                    break;
+                case Portal.Side.Bottom:
+                    if (Instance.ghostFirePoint.position.y > linked.transform.position.y)
+                    {
+                        transformBulletToGhost = true;
+                        return true;
+                    }
+                    break;
+                default:
+                    return false;
+            }
+        }
+        transformBulletToGhost = false;
+        return false;
     }
     /*
     private void OnCollisionStay2D(Collision2D col)

@@ -2625,6 +2625,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   arm: {fileID: 306537413}
+  ghostArm: {fileID: 171506898}
+  realArm: {fileID: 306537413}
   player: {fileID: 579026100}
 --- !u!1 &309726392
 GameObject:
@@ -6276,6 +6278,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc634eae0915ac94b9c91ca15d83cedf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  shoulder: {fileID: 306537413}
+  ghostFirePoint: {fileID: 33271881}
   moveSpeed: 7
   accelerationTime: 0.1
   head: {fileID: 460928894}
@@ -6293,6 +6297,7 @@ MonoBehaviour:
   cubeHoldPoint: {fileID: 1412092753}
   pickupRange: 1
   pickupKey: 304
+  canPickup: 1
   airSpeed: 50
   groundFriction: 0.9
   airDeceleration: 0.1
@@ -10185,6 +10190,7 @@ MonoBehaviour:
   head: {fileID: 689156915}
   facingRight: 1
   targetObject: {fileID: 579026096}
+  shoulder: {fileID: 171506898}
 --- !u!1 &1041491516
 GameObject:
   m_ObjectHideFlags: 0
@@ -20150,6 +20156,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   firePoint: {fileID: 553214622}
+  ghostFirePoint: {fileID: 33271881}
   bulletPrefab: {fileID: 659509049048605097, guid: ba38161f150f1644ea26142833b97dc2, type: 3}
   bulletSpeed: 50
   playerCollider: {fileID: 579026103}

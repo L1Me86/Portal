@@ -5,6 +5,7 @@ using UnityEngine;
 public class GunController : MonoBehaviour
 {
     public Transform firePoint;
+    public Transform ghostFirePoint;
     public GameObject bulletPrefab;
     public float bulletSpeed = 100f;
     public Collider2D playerCollider;
@@ -24,7 +25,9 @@ public class GunController : MonoBehaviour
 
     void Shoot(bool isBlue)
     {
-        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+        bool transformToGhost = PlayerMovement.bulletTransform();
+
+        GameObject bullet = Instantiate(bulletPrefab, transformToGhost ? ghostFirePoint.position : firePoint.position, firePoint.rotation);
 
         Bullet bulletScript = bullet.GetComponent<Bullet>();
         bulletScript.setPortalType(isBlue);

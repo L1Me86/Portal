@@ -12,6 +12,10 @@ public class Bullet : MonoBehaviour
 
     void Start()
     {
+        if (!player.GetComponent<PlayerMovement>().canPickup)
+        {
+            Destroy(gameObject);
+        }
         Collider2D bulletCol = GetComponent<Collider2D>();
         Physics2D.IgnoreCollision(bulletCol, playerCollider);
         Collider2D[] playerColliders = player.GetComponentsInChildren<Collider2D>();

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Burst.Intrinsics;
 using Unity.VisualScripting;
 using UnityEditor.Build;
 using UnityEngine;
@@ -14,6 +15,7 @@ public class Portal : MonoBehaviour
     public static HashSet<GameObject> activeHorizontalTriggers = new HashSet<GameObject>();
     public Collider2D sitsOn;
     private bool unlock = true;
+    private ArmRotation arm;
     public enum Side
     {
         Left,
@@ -366,8 +368,10 @@ public class Portal : MonoBehaviour
                 {
                     GhostMovement.offset = range;
                 }
-            }
 
+                PlayerMovement.isInPortal = true;
+                PlayerMovement.linked= this.linkedPortal;
+            }
 
 
             if (other.CompareTag("PortalTrigger"))
@@ -377,6 +381,11 @@ public class Portal : MonoBehaviour
                     TeleportPlayer(other);
                     Debug.Log($"Portal at {this.linkedPortal.transform.position} | Teleported at: {other.transform.position}");
                     Debug.Log($"Unlock {unlock}");
+                }
+                else
+                {
+                    PlayerMovement.isInPortal = true;
+                    PlayerMovement.linked = this.linkedPortal;
                 }
             }
 
@@ -414,6 +423,9 @@ public class Portal : MonoBehaviour
                     }
 
                     Debug.Log("Wall phasing ENABLED");
+                    PlayerMovement.isInPortal = true;
+                    PlayerMovement.linked = this.linkedPortal;
+
                 }
             }
         }
@@ -557,5 +569,7 @@ public class Portal : MonoBehaviour
         }
         if (other.CompareTag("Player"))
             unlock = true;
+        if (!other.CompareTag("PortalTrigger"))
+            PlayerMovement.isInPortal = false;
     }
 }
