@@ -55,6 +55,11 @@ public class GhostMovement : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (!PlayerMovement.isInPortal)
+        {
+            offset = Vector3.up * 25;
+        }
+
         bool did = false;
         if (calc != null && (calc[0] == Portal.Side.Right || calc[0] == Portal.Side.Left))
         {

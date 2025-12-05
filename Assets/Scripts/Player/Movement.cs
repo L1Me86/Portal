@@ -49,6 +49,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Speed Limits")]
     public float maxGroundSpeed = 20f;
     public float maxAirSpeed = 100f;
+    public float maxFallSpeed = 40f;
 
     void Awake()
     {
@@ -144,6 +145,8 @@ public class PlayerMovement : MonoBehaviour
         newX = Mathf.Clamp(newX, -maxSpeed, maxSpeed);
 
         rb.velocity = new Vector2(newX, rb.velocity.y);
+
+        if (rb.velocity.y < -maxFallSpeed) rb.velocity = new Vector2(rb.velocity.x, -maxFallSpeed);
 
         if (facingRight == false && moveInput > 0)
         {
