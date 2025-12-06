@@ -49,7 +49,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Speed Limits")]
     public float maxGroundSpeed = 20f;
     public float maxAirSpeed = 100f;
-    public float maxFallSpeed = 40f;
+    public float maxFallSpeed = 60f;
 
     void Awake()
     {
