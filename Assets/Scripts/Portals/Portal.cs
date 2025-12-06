@@ -436,19 +436,20 @@ public class Portal : MonoBehaviour
         if (GhostMovement.calc[0] != Side.Default && other.name == "RealPlayer")
         { 
             Vector3 range = this.linkedPortal.transform.position - this.transform.position;
+            Vector3 rangePlayer = this.linkedPortal.transform.position - other.transform.position;
             if (this.side == Side.Right)
             {
                 if (this.linkedPortal.side == Side.Top)
                 {
-                    float offset = (this.transform.position.x - other.transform.position.x);
+                    float offset = MathF.Abs(this.transform.position.x - other.transform.position.x);
 
-                    Vector3 adjustedOffset = new Vector3(range.x + offset, range.y + offset);
+                    Vector3 adjustedOffset = new Vector3(range.x + offset, rangePlayer.y + offset);
 
                     GhostMovement.offset = adjustedOffset;
                 }
                 else if (this.linkedPortal.side == Side.Bottom)
                 {
-                    float offset = (this.transform.position.x - other.transform.position.x);
+                    float offset = MathF.Abs(this.transform.position.x - other.transform.position.x);
 
                     Vector3 adjustedOffset = new Vector3(range.x + offset, range.y - offset);
 
@@ -464,17 +465,17 @@ public class Portal : MonoBehaviour
             {
                 if (this.linkedPortal.side == Side.Top)
                 {
-                    float offset = (this.transform.position.x - other.transform.position.x);
+                    float offset = MathF.Abs(this.transform.position.x - other.transform.position.x);
 
-                    Vector3 adjustedOffset = new Vector3(range.x + offset, range.y - offset);
+                    Vector3 adjustedOffset = new Vector3(range.x - offset, rangePlayer.y + offset);
 
                     GhostMovement.offset = adjustedOffset;
                 }
                 else if (this.linkedPortal.side == Side.Bottom)
                 {
-                    float offset = (this.transform.position.x - other.transform.position.x);
+                    float offset = MathF.Abs(this.transform.position.x - other.transform.position.x);
 
-                    Vector3 adjustedOffset = new Vector3(range.x + offset, range.y + offset);
+                    Vector3 adjustedOffset = new Vector3(range.x - offset, rangePlayer.y - offset);
 
                     GhostMovement.offset = adjustedOffset;
                 }
@@ -488,7 +489,7 @@ public class Portal : MonoBehaviour
             {
                 if (this.linkedPortal.side == Side.Right)
                 {
-                    Vector3 offset = this.transform.position - other.transform.position;
+                    Vector3 offset = (this.transform.position - other.transform.position);
 
                     Vector3 adjustedOffset = new Vector3(range.x + offset.x - offset.y, range.y + offset.y);
 
@@ -540,7 +541,7 @@ public class Portal : MonoBehaviour
     {
         if (other == null) return;
 
-        if (other.CompareTag("Player") && this.linkedPortal != null)
+        if (other.name == "RealPlayer" && this.linkedPortal != null)
         {
             GhostMovement.offset = Vector3.up * 25;
         }

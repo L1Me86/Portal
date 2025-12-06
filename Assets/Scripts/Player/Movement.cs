@@ -12,6 +12,7 @@ public class PlayerMovement : MonoBehaviour
     public float moveSpeed = 5f;
     public float accelerationTime = 0.2f;
     public Transform head;
+    public Transform spawn;
     public float jumpForce = 7f;
     public float gravityScale = 3f;
     public Transform groundCheck;
@@ -72,7 +73,7 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        GetComponent<Collider2D>().gameObject.transform.position = Vector3.up * 20;
+        GetComponent<Collider2D>().gameObject.transform.position = spawn.position;
     }
 
     void Update()
