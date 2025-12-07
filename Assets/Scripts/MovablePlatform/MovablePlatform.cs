@@ -9,6 +9,8 @@ public class MovingPlatform : MonoBehaviour
     public float speed = 2f;
     public Vector2 platformVelocity;
     public Button button;
+    public bool stay;
+    public Collider2D portalTriggerCol;
 
     private Vector3 targetPoint;
     private Vector3 lastPosition;
@@ -25,9 +27,23 @@ public class MovingPlatform : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (button != null && button.isPressed)
+        if (stay)
         {
-            MovePlatformFixed();
+            if (button != null && button.isPressed)
+            {
+                MovePlatformFixedStay(true);
+            }
+            else
+            {
+                MovePlatformFixedStay(false);
+            }
+        }
+        else
+        {
+            if (button != null && button.isPressed)
+            {
+                MovePlatformFixed();
+            }
         }
 
         Vector3 displacement = transform.position - lastPosition;
@@ -57,6 +73,49 @@ public class MovingPlatform : MonoBehaviour
         if (Vector3.Distance(transform.position, targetPoint) < 0.05f)
         {
             targetPoint = targetPoint == pointA.position ? pointB.position : pointA.position;
+        }
+    }
+    void MovePlatformFixedStay(bool toPoint)
+    {
+        if (toPoint)
+        {
+            if (Vector3.Distance(transform.position, targetPoint) < 0.01f)
+            {
+                portalTriggerCol.enabled = true;
+                return;
+            }
+            GameObject[] activePortals = GameObject.FindGameObjectsWithTag("Portal");
+
+            foreach (GameObject port in activePortals)
+            {
+                if (port.GetComponent<Portal>().sitsOn == portalTriggerCol)
+                {
+                    port.GetComponent<Portal>().linkedPortal.Unlink();
+                    GameObject.Destroy(port);
+                }
+            }
+            portalTriggerCol.enabled = false;
+            transform.position = Vector3.MoveTowards(transform.position, targetPoint, speed * Time.fixedDeltaTime);
+        }
+        else
+        {
+            if (Vector3.Distance(transform.position, pointA.position) < 0.01f)
+            {
+                portalTriggerCol.enabled = true;
+                return;
+            }
+            GameObject[] activePortals = GameObject.FindGameObjectsWithTag("Portal");
+
+            foreach (GameObject port in activePortals)
+            {
+                if (port.GetComponent<Portal>().sitsOn == portalTriggerCol)
+                {
+                    port.GetComponent<Portal>().linkedPortal.Unlink();
+                    GameObject.Destroy(port);
+                }
+            }
+            portalTriggerCol.enabled = false;
+            transform.position = Vector3.MoveTowards(transform.position, pointA.position, speed * Time.fixedDeltaTime);
         }
     }
 

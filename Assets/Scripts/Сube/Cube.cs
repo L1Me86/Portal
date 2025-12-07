@@ -6,6 +6,7 @@ public class Cube : MonoBehaviour
     public bool isPickedUp = false;
     public Transform holder;
     public PlayerMovement player;
+    public Transform spawn;
 
     private Rigidbody2D rb;
     private Collider2D col;
@@ -25,7 +26,7 @@ public class Cube : MonoBehaviour
         col = GetComponent<Collider2D>();
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
         playerCols = player.transform.parent.GetComponentsInChildren<Collider2D>();
-        this.rb.transform.position = new Vector3(2, 20);
+        GetComponent<Collider2D>().gameObject.transform.position = spawn.position;
     }
 
 

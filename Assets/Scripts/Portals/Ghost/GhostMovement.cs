@@ -1,10 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Burst.Intrinsics;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 public class GhostMovement : MonoBehaviour
 {
+    public static GhostMovement Instance { get; private set; }
+
     public Transform target;
     static public Vector3 offset;
     public static Portal.Side[] calc = new Portal.Side[2];
@@ -14,6 +17,28 @@ public class GhostMovement : MonoBehaviour
 
     private Rigidbody2D rb;
     private PlayerMovement playerMovement;
+
+    [SerializeField] private Transform shoulder;
+    public Transform Shoulder => shoulder;
+
+    void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+
+        InitializeReferences();
+    }
+    void InitializeReferences()
+    {
+        if (shoulder == null) shoulder = transform.Find("Shoulder");
+    }
+
     void Start()
     {
         offset = Vector3.up * 25;
@@ -30,6 +55,11 @@ public class GhostMovement : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (!PlayerMovement.isInPortal)
+        {
+            offset = Vector3.up * 25;
+        }
+
         bool did = false;
         if (calc != null && (calc[0] == Portal.Side.Right || calc[0] == Portal.Side.Left))
         {

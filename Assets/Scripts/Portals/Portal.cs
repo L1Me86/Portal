@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Burst.Intrinsics;
 using Unity.VisualScripting;
 using UnityEditor.Build;
 using UnityEngine;
@@ -12,7 +13,9 @@ public class Portal : MonoBehaviour
     public bool isBlue = true;
     public static HashSet<GameObject> activeVerticalTriggers = new HashSet<GameObject>();
     public static HashSet<GameObject> activeHorizontalTriggers = new HashSet<GameObject>();
+    public Collider2D sitsOn;
     private bool unlock = true;
+    private ArmRotation arm;
     public enum Side
     {
         Left,
@@ -34,7 +37,6 @@ public class Portal : MonoBehaviour
 
         if (blueChild != null) blueChild.gameObject.SetActive(isBlue);
         if (orangeChild != null) orangeChild.gameObject.SetActive(!isBlue);
-
     }
 
     void CreateChildrenIfMissing()
@@ -366,8 +368,10 @@ public class Portal : MonoBehaviour
                 {
                     GhostMovement.offset = range;
                 }
-            }
 
+                PlayerMovement.isInPortal = true;
+                PlayerMovement.linked= this.linkedPortal;
+            }
 
 
             if (other.CompareTag("PortalTrigger"))
@@ -377,6 +381,11 @@ public class Portal : MonoBehaviour
                     TeleportPlayer(other);
                     Debug.Log($"Portal at {this.linkedPortal.transform.position} | Teleported at: {other.transform.position}");
                     Debug.Log($"Unlock {unlock}");
+                }
+                else
+                {
+                    PlayerMovement.isInPortal = true;
+                    PlayerMovement.linked = this.linkedPortal;
                 }
             }
 
@@ -414,6 +423,9 @@ public class Portal : MonoBehaviour
                     }
 
                     Debug.Log("Wall phasing ENABLED");
+                    PlayerMovement.isInPortal = true;
+                    PlayerMovement.linked = this.linkedPortal;
+
                 }
             }
         }
@@ -424,19 +436,20 @@ public class Portal : MonoBehaviour
         if (GhostMovement.calc[0] != Side.Default && other.name == "RealPlayer")
         { 
             Vector3 range = this.linkedPortal.transform.position - this.transform.position;
+            Vector3 rangePlayer = this.linkedPortal.transform.position - other.transform.position;
             if (this.side == Side.Right)
             {
                 if (this.linkedPortal.side == Side.Top)
                 {
-                    float offset = (this.transform.position.x - other.transform.position.x);
+                    float offset = MathF.Abs(this.transform.position.x - other.transform.position.x);
 
-                    Vector3 adjustedOffset = new Vector3(range.x + offset, range.y + offset);
+                    Vector3 adjustedOffset = new Vector3(range.x + offset, rangePlayer.y + offset);
 
                     GhostMovement.offset = adjustedOffset;
                 }
                 else if (this.linkedPortal.side == Side.Bottom)
                 {
-                    float offset = (this.transform.position.x - other.transform.position.x);
+                    float offset = MathF.Abs(this.transform.position.x - other.transform.position.x);
 
                     Vector3 adjustedOffset = new Vector3(range.x + offset, range.y - offset);
 
@@ -452,17 +465,17 @@ public class Portal : MonoBehaviour
             {
                 if (this.linkedPortal.side == Side.Top)
                 {
-                    float offset = (this.transform.position.x - other.transform.position.x);
+                    float offset = MathF.Abs(this.transform.position.x - other.transform.position.x);
 
-                    Vector3 adjustedOffset = new Vector3(range.x + offset, range.y - offset);
+                    Vector3 adjustedOffset = new Vector3(range.x - offset, rangePlayer.y + offset);
 
                     GhostMovement.offset = adjustedOffset;
                 }
                 else if (this.linkedPortal.side == Side.Bottom)
                 {
-                    float offset = (this.transform.position.x - other.transform.position.x);
+                    float offset = MathF.Abs(this.transform.position.x - other.transform.position.x);
 
-                    Vector3 adjustedOffset = new Vector3(range.x + offset, range.y + offset);
+                    Vector3 adjustedOffset = new Vector3(range.x - offset, rangePlayer.y - offset);
 
                     GhostMovement.offset = adjustedOffset;
                 }
@@ -476,7 +489,7 @@ public class Portal : MonoBehaviour
             {
                 if (this.linkedPortal.side == Side.Right)
                 {
-                    Vector3 offset = this.transform.position - other.transform.position;
+                    Vector3 offset = (this.transform.position - other.transform.position);
 
                     Vector3 adjustedOffset = new Vector3(range.x + offset.x - offset.y, range.y + offset.y);
 
@@ -528,7 +541,7 @@ public class Portal : MonoBehaviour
     {
         if (other == null) return;
 
-        if (other.CompareTag("Player") && this.linkedPortal != null)
+        if (other.name == "RealPlayer" && this.linkedPortal != null)
         {
             GhostMovement.offset = Vector3.up * 25;
         }
@@ -557,5 +570,7 @@ public class Portal : MonoBehaviour
         }
         if (other.CompareTag("Player"))
             unlock = true;
+        if (!other.CompareTag("PortalTrigger"))
+            PlayerMovement.isInPortal = false;
     }
 }
