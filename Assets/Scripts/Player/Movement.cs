@@ -32,6 +32,7 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 addedVelocity;
     private bool justTeleported = false;
     private int teleportFrames = 3;
+    private int rere = 3;
 
     [Header("Cube Pickup")]
     public Transform cubeHoldPoint;
