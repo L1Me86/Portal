@@ -1,4 +1,5 @@
 using System.Numerics;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -34,8 +35,6 @@ public class Bullet : MonoBehaviour
         Debug.Log(collider);
         string t = collider.tag;
         float portalSize = (portalPrefab.GetComponent<Collider2D>() as BoxCollider2D).size.y / 2f;
-        float colliderSizeY = (collider as BoxCollider2D).size.y / 2f;
-        float colliderSizeX = (collider as BoxCollider2D).size.x / 2f;
 
         if (!string.IsNullOrEmpty(t) && t.StartsWith("PortalSurface"))
         {
@@ -46,6 +45,34 @@ public class Bullet : MonoBehaviour
                 collider = collider.GetComponent<Portal>().sitsOn;
                 t = collider.tag;
             }
+
+            float colliderSizeY = (collider as BoxCollider2D).size.y / 2f;
+            float colliderSizeX = (collider as BoxCollider2D).size.x / 2f;
+
+
+            GameObject[] activePortals = GameObject.FindGameObjectsWithTag("Portal");
+
+            foreach (GameObject port in activePortals)
+            {
+                if (port.GetComponent<Portal>().sitsOn == collider && port.GetComponent<Portal>().isBlue != isBluePortal)
+                {
+                    if (Mathf.Max(colliderSizeY, colliderSizeX) < portalSize * 2f)
+                    {
+                        Destroy(gameObject);
+                        return;
+                    }
+                    else
+                    {
+                        bool onTop = port.transform.rotation != new UnityEngine.Quaternion(0, 0, 0, 0) ? true : false;
+                        if (Mathf.Abs(onTop ? (collider.transform.position.x - port.transform.position.x) : (collider.transform.position.y - port.transform.position.y)) + Mathf.Max(colliderSizeX, colliderSizeY) - portalSize < portalSize * 2f )
+                        {
+                            Destroy(gameObject);
+                            return;
+                        }
+                    }
+                }
+            }
+
 
             if (t == "PortalSurfaceRight" || t == "PortalSurfaceLeft")
             {
@@ -156,81 +183,11 @@ public class Bullet : MonoBehaviour
                 }
             }
         }
-        else if (!string.IsNullOrEmpty(t) && t.Equals("Portal"))
-        {
-            Debug.Log("Hited Portal");
-        }
         else
         {
             Destroy(gameObject);
         }
     }
-    /*
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        Transform current = collision.collider.transform;
-        bool placed = false;
-
-        while (current != null)
-        {
-            string t = current.tag;
-            if (!string.IsNullOrEmpty(t) && t.StartsWith("PortalSurface"))
-            {
-                Vector2 hitPoint = collision.GetContact(0).point;
-
-                GameObject portalObj = Instantiate(portalPrefab, hitPoint, Quaternion.identity);
-                Portal newPortal = portalObj.GetComponent<Portal>();
-                newPortal.isBlue = isBluePortal;
-                
-                switch (t)
-                {
-                    case "PortalSurfaceRight":
-                        newPortal.side = Portal.Side.Right;
-                        break;
-                    case "PortalSurfaceLeft":
-                        newPortal.side = Portal.Side.Left;
-                        break;
-                    case "PortalSurfaceBott":
-                        newPortal.side = Portal.Side.Bottom;
-                        newPortal.transform.Rotate(0, 0, 90);
-                        break;
-                    case "PortalSurfaceUp":
-                        newPortal.side = Portal.Side.Top;
-                        newPortal.transform.Rotate(0, 0, 90);
-                        break;
-                    default:
-                        Debug.LogError("!!! Untagged surface portal creating attempt" + t);
-                        break;
-                }
-
-                Transform activeChild = portalObj.transform.Find(isBluePortal ? "PortalBlue" : "PortalOrange");
-                if (activeChild != null)
-                {
-                    SpriteRenderer sr = activeChild.GetComponent<SpriteRenderer>();
-                    if (sr != null)
-                    {
-                        sr.sortingLayerName = "Portal";
-                        sr.sortingOrder = 100;
-                    }
-                }
-
-
-                Portal opposite = GunController.GetOppositePortal(isBluePortal);
-                GunController.SetActivePortal(isBluePortal, newPortal);
-
-                if (opposite != null)
-                {
-                    newPortal.LinkTo(opposite);
-                }
-
-
-                placed = true;
-                break;
-            }
-            current = current.parent;
-        }
-        Destroy(gameObject);
-    }*/
 
     private void OnBecameInvisible()
     {
