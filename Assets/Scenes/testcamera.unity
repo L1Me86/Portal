@@ -5535,7 +5535,6 @@ GameObject:
   m_Component:
   - component: {fileID: 579026097}
   - component: {fileID: 579026099}
-  - component: {fileID: 579026100}
   - component: {fileID: 579026103}
   - component: {fileID: 579026104}
   m_Layer: 0
@@ -5557,18 +5556,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 306537413}
-  - {fileID: 460928894}
-  - {fileID: 426417071}
-  - {fileID: 896758267}
-  - {fileID: 1908256063}
-  - {fileID: 262598893}
-  - {fileID: 854634124}
-  - {fileID: 180070719}
-  - {fileID: 812241296}
-  - {fileID: 49800075}
-  - {fileID: 1713102088}
+  m_Children: []
   m_Father: {fileID: 1183704054}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!50 &579026099
@@ -5598,7 +5586,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
---- !u!114 &579026100
+--- !u!114 &579026100 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3254443422074634466, guid: 01d26e03886e3034c9a584407daeb780, type: 3}
   m_PrefabInstance: {fileID: 5146859861491175656}
@@ -5609,29 +5597,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc634eae0915ac94b9c91ca15d83cedf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 7
-  accelerationTime: 0.1
-  head: {fileID: 460928894}
-  jumpForce: 18
-  gravityScale: 6
-  groundCheck: {fileID: 302797822}
-  groundCheckRadius: 0.2
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 8
-  facingRight: 1
-  moveInput: 0
-  currentSpeed: 0
-  jumpHeight: 0
-  cubeHoldPoint: {fileID: 1412092753}
-  pickupRange: 1
-  pickupKey: 304
-  airSpeed: 50
-  groundFriction: 0.9
-  airDeceleration: 0.1
-  groundDeceleration: 50
-  maxGroundSpeed: 8
-  maxAirSpeed: 100
 --- !u!70 &579026103
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -10093,7 +10058,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 579026097}
-  - {fileID: 1040602248}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1198276119
@@ -17321,6 +17285,8 @@ MonoBehaviour:
   speed: 2
   platformVelocity: {x: 0, y: 0}
   button: {fileID: 1041491520}
+  stay: 0
+  portalTriggerCol: {fileID: 0}
 --- !u!1 &1870011432
 GameObject:
   m_ObjectHideFlags: 0
@@ -19973,3 +19939,4 @@ SceneRoots:
   - {fileID: 1271078328}
   - {fileID: 1448044588}
   - {fileID: 1780420399}
+  - {fileID: 1183704054}

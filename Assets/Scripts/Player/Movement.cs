@@ -32,14 +32,12 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 addedVelocity;
     private bool justTeleported = false;
     private int teleportFrames = 3;
-    private int rere = 3;
 
     [Header("Cube Pickup")]
-    public Transform cubeHoldPoint;
+    public Transform cubeHoldPoint;   
     public float pickupRange = 4f;
     public KeyCode pickupKey = KeyCode.E;
-
-    private Cube carriedCube;
+    public Cube carriedCube;
     public bool canPickup = true;
 
     [Header("Air Control")]

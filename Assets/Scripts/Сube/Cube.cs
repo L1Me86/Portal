@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class Cube : MonoBehaviour
 {
@@ -136,4 +137,22 @@ public class Cube : MonoBehaviour
 
     }
 
+    public void TeleportWithHolder(Vector3 targetPos, Quaternion targetRot)
+    {
+        StartCoroutine(TeleportRoutine(targetPos, targetRot));
+    }
+
+    private IEnumerator TeleportRoutine(Vector3 pos, Quaternion rot)
+    {
+        rb.isKinematic = true;
+        rb.gravityScale = 0f;
+
+        rb.position = pos;
+        rb.rotation = rot.eulerAngles.z;
+        Physics2D.SyncTransforms();
+
+        yield return null; // ждём один кадр
+
+        rb.isKinematic = true; // оставляем киниматик, если куб на руках
+    }
 }

@@ -342,6 +342,13 @@ public class Portal : MonoBehaviour
             pMovement.JustTeleported();
         }
 
+        // “елепортируем куб, если он на руках у игрока
+        if (pMovement != null && pMovement.carriedCube != null)
+        {
+            Vector3 cubeTargetPos = pMovement.cubeHoldPoint.position;
+            Quaternion cubeTargetRot = pMovement.cubeHoldPoint.rotation;
+            pMovement.carriedCube.TeleportWithHolder(cubeTargetPos, cubeTargetRot);
+        }
 
         StartCoroutine(ApplyVelocityAfterFixed(rb, newVelocity));
 
@@ -355,6 +362,7 @@ public class Portal : MonoBehaviour
         }
     }
 
+    
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (this.linkedPortal != null)
@@ -428,7 +436,55 @@ public class Portal : MonoBehaviour
 
                 }
             }
+
+            // ≈сли это куб на земле
+            if (other.CompareTag("Cube"))
+            {
+                Cube cube = other.GetComponent<Cube>();
+                if (cube != null && !cube.isPickedUp && linkedPortal != null)
+                {
+                    Vector2 size = cube.GetComponent<Collider2D>().bounds.size;
+                    Vector3 cubeOffset = Vector3.zero;
+
+                    switch (linkedPortal.side)
+                    {
+                        case Side.Left:
+                            cubeOffset = new Vector3(-size.x / 2, 0, 0);
+                            break;
+                        case Side.Right:
+                            cubeOffset = new Vector3(size.x / 2, 0, 0);
+                            break;
+                        case Side.Top:
+                            cubeOffset = new Vector3(0, size.y / 2, 0);
+                            break;
+                        case Side.Bottom:
+                            cubeOffset = new Vector3(0, -size.y / 2, 0);
+                            break;
+                    }
+
+                    Vector3 targetPos = linkedPortal.transform.position + cubeOffset;
+                    cube.TeleportWithHolder(targetPos, cube.transform.rotation);
+                } 
+            }
         }
+    }
+
+
+    private void TeleportCube(Cube cube)
+    {
+        if (cube == null || linkedPortal == null) return;
+
+        Rigidbody2D rb = cube.GetComponent<Rigidbody2D>();
+        Vector2 oldVelocity = rb.velocity;
+
+        // –ассчитываем новую позицию относительно портала
+        Vector3 newPos = linkedPortal.transform.position + (cube.transform.position - transform.position);
+
+        rb.position = newPos;
+        Physics2D.SyncTransforms();
+
+        // ћожно скорректировать скорость куба так же, как у игрока, если нужно
+        rb.velocity = oldVelocity;
     }
 
     private void OnTriggerStay2D(Collider2D other)
