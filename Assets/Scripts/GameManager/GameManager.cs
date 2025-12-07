@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour
 {
     public static bool gameIsPaused = false;
     public static bool gameIsEnded = false;
+    public static GameManager Instance;
     public GameObject pausePanel;
 
     void Start()
@@ -24,6 +25,12 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape) && !gameIsEnded)
         if (gameIsPaused) ResumeGame();
         else PauseGame();
+    }
+
+    void Awake()
+    {
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
     }
 
     public void ResumeGame()

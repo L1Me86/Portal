@@ -278,20 +278,4 @@ public class PlayerMovement : MonoBehaviour
         transformBulletToGhost = false;
         return false;
     }
-    /*
-    private void OnCollisionStay2D(Collision2D col)
-    {
-        if (col.collider.CompareTag("MovablePlatform"))
-        {
-            MovingPlatform plat = col.collider.GetComponent<MovingPlatform>();
-            if (plat != null)
-            {
-                addedVelocity = plat.platformVelocity;
-            }
-        }
-        else
-        {
-            addedVelocity = Vector2.zero;
-        }
-    }*/
 }
