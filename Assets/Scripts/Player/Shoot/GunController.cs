@@ -5,10 +5,8 @@ using UnityEngine;
 public class GunController : MonoBehaviour
 {
     public Transform firePoint;
-    public Transform ghostFirePoint;
     public GameObject bulletPrefab;
-    public float bulletSpeed = 100f;
-    public Collider2D playerCollider;
+    public float bulletSpeed = 15f;
 
     public Color blueColor = new Color(0.663f, 0.588f, 1f);
     public Color orangeColor = new Color(1f, 0.68f, 0.36f);
@@ -18,21 +16,17 @@ public class GunController : MonoBehaviour
 
     void Update()
     {
-        if (GameManager.gameIsPaused) return;
+        if (GameManager.gameIsPaused || GameManager.gameIsEnded || GameManager.gameIsFinished) return;
         if (Input.GetMouseButtonDown(0)) Shoot(true);
         if (Input.GetMouseButtonDown(1)) Shoot(false);
     }
 
     void Shoot(bool isBlue)
     {
-        bool transformToGhost = PlayerMovement.bulletTransform();
-
-        GameObject bullet = Instantiate(bulletPrefab, transformToGhost ? ghostFirePoint.position : firePoint.position, firePoint.rotation);
+        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
 
         Bullet bulletScript = bullet.GetComponent<Bullet>();
         bulletScript.setPortalType(isBlue);
-        bulletScript.playerCollider = playerCollider;
-        bulletScript.player = playerCollider.gameObject;
 
         bullet.GetComponent<SpriteRenderer>().color = isBlue ? blueColor : orangeColor;
 
@@ -42,31 +36,19 @@ public class GunController : MonoBehaviour
 
     public static void SetActivePortal(bool isBlue, Portal portal)
     {
-        if (isBlue)
+        if (isBlue && bluePortal != null)
         {
-            if (bluePortal != null)
-            {
-                bluePortal.Unlink();
-                Destroy(bluePortal.gameObject);
-            }
-
-            bluePortal = portal;
+            bluePortal.Unlink();
+            Destroy(bluePortal.gameObject);
         }
-        else
+        if (!isBlue && orangePortal != null)
         {
-            if (orangePortal != null)
-            {
-                orangePortal.Unlink();
-                Destroy(orangePortal.gameObject);
-            }
-
-            orangePortal = portal;
+            orangePortal.Unlink();
+            Destroy(orangePortal.gameObject);
         }
-    }
 
-    public static Portal GetActivePortal(bool isBlue)
-    {
-        return isBlue ? bluePortal : orangePortal;
+        if (isBlue) bluePortal = portal;
+        else orangePortal = portal;
     }
 
     public static Portal GetOppositePortal(bool isBlue)

@@ -28,7 +28,7 @@ public class FinishButton : MonoBehaviour
                 isPressed = true;
 
                 // »грок нажал кнопку Ч вызываем меню паузы / конец игры
-                GameManager.Instance.PauseGame(); // или свой метод дл€ конца игры
+                GameManager.Instance.FinishGame(); // или свой метод дл€ конца игры
 
                 break;
             }

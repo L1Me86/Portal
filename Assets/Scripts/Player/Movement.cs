@@ -1,18 +1,10 @@
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public static PlayerMovement Instance { get; private set; }
-    [SerializeField] private Transform shoulder;
-    public Transform Shoulder => shoulder;
-
-    public Transform ghostFirePoint;
-
     public float moveSpeed = 5f;
-    public float accelerationTime = 0.2f;
+    public float accelerationTime = 0.5f;
     public Transform head;
-    public Transform spawn;
     public float jumpForce = 7f;
     public float gravityScale = 3f;
     public Transform groundCheck;
@@ -21,63 +13,29 @@ public class PlayerMovement : MonoBehaviour
     public bool facingRight = true;
     public float moveInput;
     public float currentSpeed;
-    public float jumpHeight = 0;
-    public static bool isInPortal = false;
-    public static bool transformBulletToGhost = false;
-    public static Portal linked;
 
     private float accelerationTimer;
     private bool isGrounded;
     private Rigidbody2D rb;
-    private Vector2 addedVelocity;
-    private bool justTeleported = false;
-    private int teleportFrames = 3;
 
     [Header("Cube Pickup")]
-    public Transform cubeHoldPoint;   
+    public Transform cubeHoldPoint;
     public float pickupRange = 4f;
     public KeyCode pickupKey = KeyCode.E;
-    public Cube carriedCube;
-    public bool canPickup = true;
 
-    [Header("Air Control")]
-    public float airSpeed = 3f;
-    public float groundFriction = 0.9f;
-    public float airDeceleration = 0.5f;
-    public float groundDeceleration = 50f;
+    private Cube carriedCube;
+    private bool canPickup = true;
 
-    [Header("Speed Limits")]
-    public float maxGroundSpeed = 20f;
-    public float maxAirSpeed = 100f;
-    public float maxFallSpeed = 60f;
-
-    void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-
-        InitializeReferences();
-    }
-    void InitializeReferences()
-    {
-        if (shoulder == null) shoulder = transform.Find("Shoulder");
-    }
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        GetComponent<Collider2D>().gameObject.transform.position = spawn.position;
+        GetComponent<Collider2D>().gameObject.transform.position = Vector3.up * 20;
     }
 
     void Update()
     {
-        moveInput = Input.GetAxisRaw("Horizontal");
+        moveInput = Input.GetAxis("Horizontal");
 
         if (moveInput != 0)
         {
@@ -92,20 +50,11 @@ public class PlayerMovement : MonoBehaviour
 
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
 
-        if (!isGrounded)
-        {
-            if (rb.position.y > jumpHeight)
-                jumpHeight = rb.position.y;
-        }
-        else
-        {
-            jumpHeight = 0;
-        }
-
         if (Input.GetButtonDown("Jump") && isGrounded)
             Jump();
 
-        currentSpeed = moveSpeed;
+        float accelerationProgress = Mathf.Clamp01(accelerationTimer / accelerationTime);
+        currentSpeed = Mathf.Lerp(0, moveSpeed, accelerationProgress);
 
         if (Input.GetKeyDown(pickupKey))
         {
@@ -122,31 +71,7 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (justTeleported)
-        {
-            teleportFrames--;
-            if (teleportFrames <= 0) justTeleported = false;
-            return;
-        }
-
-        float targetSpeed = moveInput * moveSpeed;
-        float accel = isGrounded ? 20f : 10f;
-
-        float newX = Mathf.Lerp(rb.velocity.x, targetSpeed, accel * Time.fixedDeltaTime);
-
-        if (moveInput == 0)
-        {
-            float decel = isGrounded ? groundDeceleration : airDeceleration;
-
-            newX = Mathf.Lerp(newX, 0, decel * Time.fixedDeltaTime);
-        }
-
-        float maxSpeed = isGrounded ? maxGroundSpeed : maxAirSpeed;
-        newX = Mathf.Clamp(newX, -maxSpeed, maxSpeed);
-
-        rb.velocity = new Vector2(newX, rb.velocity.y);
-
-        if (rb.velocity.y < -maxFallSpeed) rb.velocity = new Vector2(rb.velocity.x, -maxFallSpeed);
+        rb.velocity = new Vector2(moveInput * currentSpeed, rb.velocity.y);
 
         if (facingRight == false && moveInput > 0)
         {
@@ -155,11 +80,6 @@ public class PlayerMovement : MonoBehaviour
         else if (facingRight == true && moveInput < 0)
         {
             Flip();
-        }
-
-        if (addedVelocity != Vector2.zero)
-        {
-            rb.position += addedVelocity * Time.fixedDeltaTime;
         }
     }
 
@@ -195,7 +115,7 @@ public class PlayerMovement : MonoBehaviour
             if (col.CompareTag("Cube"))
             {
                 Cube cube = col.GetComponent<Cube>();
-                if (cube != null && cube.isPickable && !cube.isPickedUp)
+                if (cube != null && !cube.isPickedUp)
                 {
                     PickupCube(cube);
                     break;
@@ -204,16 +124,10 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    public void JustTeleported()
-    {
-        justTeleported = true;
-        teleportFrames = 2;
-    }
     void PickupCube(Cube cube)
     {
         carriedCube = cube;
         cube.PickUp(cubeHoldPoint);
-        cube.transform.rotation = cubeHoldPoint.transform.parent.parent.rotation;
         canPickup = false;
     }
 
@@ -234,47 +148,5 @@ public class PlayerMovement : MonoBehaviour
         }
 
         canPickup = true;
-    }
-
-    public static bool bulletTransform()
-    {
-        if (isInPortal)
-        {
-            switch (linked.side)
-            {
-                case Portal.Side.Left:
-                    if (Instance.ghostFirePoint.position.x > linked.transform.position.x)
-                    {
-                        transformBulletToGhost = true;
-                        return true;
-                    }
-                    break;
-                case Portal.Side.Right:
-                    if (Instance.ghostFirePoint.position.x < linked.transform.position.x)
-                    {
-                        transformBulletToGhost = true;
-                        return true;
-                    }
-                    break;
-                case Portal.Side.Top:
-                    if (Instance.ghostFirePoint.position.y < linked.transform.position.y)
-                    {
-                        transformBulletToGhost = true;
-                        return true;
-                    }
-                    break;
-                case Portal.Side.Bottom:
-                    if (Instance.ghostFirePoint.position.y > linked.transform.position.y)
-                    {
-                        transformBulletToGhost = true;
-                        return true;
-                    }
-                    break;
-                default:
-                    return false;
-            }
-        }
-        transformBulletToGhost = false;
-        return false;
     }
 }

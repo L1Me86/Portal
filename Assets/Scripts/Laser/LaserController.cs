@@ -1,12 +1,14 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class LaserController : MonoBehaviour
 {
-    public float laserLength = 50f;
+    [SerializeField] private AudioSource laserSound;
+    public LaserClone laserGunClone; // Изменяем тип на LaserClone
     public LineRenderer lineRenderer;
     public float rotationSpeed = 30f;
+    public float laserLength = 50f;
 
     void Update()
     {
@@ -23,14 +25,32 @@ public class LaserController : MonoBehaviour
         if (currentHit.collider != null)
         {
             lineRenderer.SetPosition(1, currentHit.point);
+            if (currentHit.collider.CompareTag("LaserReceiver")) MakeAction();
             if (currentHit.collider.CompareTag("Player")) FindObjectOfType<GameManager>().EndGame();
-            if (!currentHit.collider.CompareTag("LaserReceiver")) MakeAction();
+            if (currentHit.collider.CompareTag("Portal"))
+            {
+                Portal portal = currentHit.collider.GetComponent<Portal>();
+                if (portal != null && portal.linkedPortal != null)
+                {
+                    CreateClone(portal.linkedPortal);
+                }
+            }
+            else if (laserGunClone != null) laserGunClone.HideClone();
         }
-        else lineRenderer.SetPosition(1, transform.position + transform.right * laserLength);
+        else
+        {
+            lineRenderer.SetPosition(1, transform.position + transform.right * laserLength);
+        }
     }
 
     public void MakeAction()
     {
-        transform.parent.Rotate(0, 0, rotationSpeed * Time.deltaTime);
+        FindObjectOfType<MovingPlatform>().MovePlatformFixed();
+    }
+
+    private void CreateClone(Portal exitPortal)
+    {
+        if (laserGunClone == null) return;
+        laserGunClone.ActivateClone(exitPortal, transform.right);
     }
 }

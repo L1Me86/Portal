@@ -1,44 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Burst.Intrinsics;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class GhostMovement : MonoBehaviour
 {
-    public static GhostMovement Instance { get; private set; }
-
     public Transform target;
     static public Vector3 offset;
-    public static Portal.Side[] calc = new Portal.Side[2];
     public Transform head;
     public bool facingRight = true;
     public GameObject targetObject;
 
     private Rigidbody2D rb;
     private PlayerMovement playerMovement;
-
-    [SerializeField] private Transform shoulder;
-    public Transform Shoulder => shoulder;
-
-    void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-
-        InitializeReferences();
-    }
-    void InitializeReferences()
-    {
-        if (shoulder == null) shoulder = transform.Find("Shoulder");
-    }
-
     void Start()
     {
         offset = Vector3.up * 25;
@@ -53,81 +26,16 @@ public class GhostMovement : MonoBehaviour
         }
     }
 
-    void FixedUpdate()
+    void Update()
     {
-        if (!PlayerMovement.isInPortal)
+        if (target != null)
         {
-            offset = Vector3.up * 25;
+            transform.position = target.position + target.TransformDirection(offset);
+            transform.rotation = target.rotation;
         }
 
-        bool did = false;
-        if (calc != null && (calc[0] == Portal.Side.Right || calc[0] == Portal.Side.Left))
-        {
-            if (calc[1] == Portal.Side.Top || calc[1] == Portal.Side.Bottom)
-            {
-                this.transform.rotation = target.transform.rotation * Quaternion.Euler(0, 0, -90);
-                transform.position = target.position + target.TransformDirection(offset);
-
-                did = true;
-            }
-        }
-        if (calc != null && (calc[0] == Portal.Side.Bottom))
-        {
-            if (calc[1] == Portal.Side.Right)
-            {
-                this.transform.rotation = target.transform.rotation * Quaternion.Euler(0, 0, -90);
-                transform.position = target.position + target.TransformDirection(offset);
-
-                did = true;
-            }
-            else if (calc[1] == Portal.Side.Left)
-            {
-                this.transform.rotation = target.transform.rotation * Quaternion.Euler(0, 0, 90);
-                transform.position = target.position + target.TransformDirection(offset);
-
-                did = true;
-            }
-            else if (calc[1] == Portal.Side.Bottom)
-            {
-                this.transform.rotation = target.transform.rotation * Quaternion.Euler(0, 0, 180);
-                transform.position = target.position + target.TransformDirection(offset);
-
-                did = true;
-            }
-        }
-        if (calc != null && (calc[0] == Portal.Side.Top))
-        {
-            if (calc[1] == Portal.Side.Right)
-            {
-                this.transform.rotation = target.transform.rotation * Quaternion.Euler(0, 0, 90);
-                transform.position = target.position + target.TransformDirection(offset);
-
-                did = true;
-            }
-            else if (calc[1] == Portal.Side.Left)
-            {
-                this.transform.rotation = target.transform.rotation * Quaternion.Euler(0, 0, -90);
-                transform.position = target.position + target.TransformDirection(offset);
-
-                did = true;
-            }
-            else if (calc[1] == Portal.Side.Top)
-            {
-                this.transform.rotation = target.transform.rotation * Quaternion.Euler(0, 0, 180);
-                transform.position = target.position + target.TransformDirection(offset);
-
-                did = true;
-            }
-        }
-        if (!did)
-        {
-            if (target != null)
-            {
-                transform.position = target.position + target.TransformDirection(offset);
-                transform.rotation = target.rotation;
-            }
-
-            head.localScale = playerMovement.head.localScale;
-        }
+        head.localScale = playerMovement.head.localScale;
     }
+
+
 }

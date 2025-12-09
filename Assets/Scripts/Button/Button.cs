@@ -9,6 +9,7 @@ public class Button : MonoBehaviour
     public float pressSpeedUp = 2f;
     public bool isPressed = false;
 
+    //private int objectsOnButton = 0;
     private Rigidbody2D rb;
     private float minSpeed = 2f;
 
@@ -28,7 +29,7 @@ public class Button : MonoBehaviour
             {
                 isPressed = true;
                 rb = hit.attachedRigidbody;
-                break;
+                break; // берём первый объект
             }
         }
 
@@ -41,6 +42,15 @@ public class Button : MonoBehaviour
         else
             MoveTowards(baseTopPoint.position, pressSpeedUp);
     }
+    //if (isPressed)
+    //{
+    //    float pressSpeedDown = rb != null ? Mathf.Max(Mathf.Abs(rb.velocity.y), minSpeed) : minSpeed;
+    //    if (transform.position.y > baseBottomPoint.position.y)
+    //        MoveTowards(baseBottomPoint.position, pressSpeedDown);
+    //}
+    //else
+    //    MoveTowards(baseTopPoint.position, pressSpeedUp);
+
 
     void MoveTowards(Vector3 target, float speed)
     {
@@ -51,3 +61,29 @@ public class Button : MonoBehaviour
         );
     }
 }
+//    private void OnTriggerStay2D(Collider2D col)
+//    {
+//        if (col.CompareTag("Cube") || col.CompareTag("Player"))
+//        {
+//            //objectsOnButton++;
+//            isPressed = true;
+//            if (rb ==  null)
+//                rb = col.GetComponent<Rigidbody2D>();
+//        }
+//    }
+
+//    private void OnTriggerExit2D(Collider2D col)
+//    {
+//        if (col.CompareTag("Cube") || col.CompareTag("Player"))
+//        {
+//            //objectsOnButton--;
+
+//            //if (objectsOnButton <= 0)
+//            //{
+//            //    objectsOnButton = 0;
+//            isPressed = false;
+//            rb = null;
+//            //}
+//        }
+//    }
+//}

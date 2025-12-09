@@ -1,35 +1,19 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Burst.Intrinsics;
-using Unity.VisualScripting;
 using UnityEditor.Build;
 using UnityEngine;
-using UnityEngine.SocialPlatforms;
 
 public class Portal : MonoBehaviour
 {
+    [SerializeField] private AudioSource portalSound;
     public Portal linkedPortal;
     public bool isBlue = true;
-    public static HashSet<GameObject> activeVerticalTriggers = new HashSet<GameObject>();
-    public static HashSet<GameObject> activeHorizontalTriggers = new HashSet<GameObject>();
-    public Collider2D sitsOn;
-    private bool unlock = true;
-    private ArmRotation arm;
-    public enum Side
-    {
-        Left,
-        Right,
-        Bottom,
-        Top,
-        Default
-    }
-    public Side side;
 
     private Vector3 range;
 
     void Start()
     {
+        portalSound.Stop();
         CreateChildrenIfMissing();
 
         Transform blueChild = transform.Find("PortalBlue");
@@ -37,6 +21,7 @@ public class Portal : MonoBehaviour
 
         if (blueChild != null) blueChild.gameObject.SetActive(isBlue);
         if (orangeChild != null) orangeChild.gameObject.SetActive(!isBlue);
+
     }
 
     void CreateChildrenIfMissing()
@@ -62,314 +47,27 @@ public class Portal : MonoBehaviour
     {
         linkedPortal = otherPortal;
         otherPortal.linkedPortal = this;
-        Debug.Log($"{name} -> linked to -> {otherPortal.name}");
     }
 
     public void Unlink()
     {
         if (linkedPortal != null)
         {
-            if (linkedPortal.linkedPortal == this)
-                linkedPortal.linkedPortal = null;
-
-            Debug.Log($"{name} -> unlinked from -> {linkedPortal.name}");
+            linkedPortal.linkedPortal = null;
             linkedPortal = null;
         }
     }
 
-    private void ReenableWallCollisionsForPlayer(GameObject player, Collider2D[] wallCols)
-    {
-        if (player == null) return;
-
-        Collider2D playerCollider = player.GetComponent<Collider2D>();
-        if (playerCollider == null) return;
-
-        foreach (var w in wallCols)
-        {
-            if (w == null) continue;
-            Physics2D.IgnoreCollision(playerCollider, w, false);
-        }
-    }
-
-    private Collider2D[] GetWallCollidersBySide(Side side)
-    {
-        string walltag;
-        switch (side)
-        {
-            case Side.Right:
-                walltag = "PortalSurfaceRight";
-                break;
-            case Side.Left:
-                walltag = "PortalSurfaceLeft";
-                break;
-            case Side.Bottom:
-                walltag = "PortalSurfaceBott";
-                break;
-            case Side.Top:
-                walltag = "PortalSurfaceUp";
-                break;
-            default:
-                walltag = "PortalSurface";
-                break;
-        }
-
-        List<Collider2D> cols = new List<Collider2D>();
-        GameObject[] triggerChildren = GameObject.FindGameObjectsWithTag(walltag);
-        HashSet<GameObject> uniqueWalls = new HashSet<GameObject>();
-
-        foreach (GameObject trigger in triggerChildren)
-        {
-            GameObject wallParent = trigger.transform.parent?.gameObject;
-
-            if (wallParent != null && uniqueWalls.Add(wallParent))
-            {
-                cols.AddRange(wallParent.GetComponentsInChildren<Collider2D>());
-            }
-        }
-        return cols.ToArray();
-    }
-
-
-    private IEnumerator ReenableWallsAfterFixed(GameObject player, Collider2D[] wallCols)
-    {
-        yield return new WaitForFixedUpdate();
-
-        ReenableWallCollisionsForPlayer(player, wallCols);
-    }
-    private IEnumerator ApplyVelocityAfterFixed(Rigidbody2D rb, Vector2 velocity)
-    {
-        yield return new WaitForFixedUpdate();
-        yield return new WaitForFixedUpdate();
-        if (rb != null)
-        {
-            rb.velocity = velocity; Debug.Log($"Velocity after apply in coroutine: {rb.velocity}");
-        }
-    }
-
-
-
-
-    private void TeleportPlayer(Collider2D triggerCollider)
-    {
-        if (triggerCollider == null || this.linkedPortal == null) return;
-
-        GameObject playerObj = triggerCollider.transform.parent != null
-                               ? triggerCollider.transform.parent.gameObject
-                               : triggerCollider.GetComponentInParent<Collider2D>()?.gameObject;
-
-
-        if (playerObj == null) return;
-
-
-        Collider2D[] playerColliders = playerObj.GetComponentsInChildren<Collider2D>();
-        if (playerColliders == null || playerColliders.Length == 0) return;
-
-        Rigidbody2D rb = playerObj.GetComponent<Rigidbody2D>();
-
-        Collider2D[] destWalls = GetWallCollidersBySide(this.linkedPortal.side);
-
-        foreach (var pcol in playerColliders)
-        {
-            if (pcol == null) continue;
-            foreach (var w in destWalls)
-            {
-                if (w == null) continue;
-                Physics2D.IgnoreCollision(pcol, w, true);
-            }
-        }
-
-        var playerParentCapsule = triggerCollider.GetComponentInParent<CapsuleCollider2D>();
-
-        Vector2 oldVelocity = rb.velocity;
-
-        Vector3 newPos;
-
-        switch (GhostMovement.calc[0])
-        {
-            case Side.Left:
-                switch (GhostMovement.calc[1])
-                {
-                    case Side.Right:
-                        newPos = this.linkedPortal.transform.position - new Vector3(triggerCollider.transform.localPosition.x, 0f, 0f);
-                        break;
-                    case Side.Top:
-                        newPos = this.linkedPortal.transform.position;
-                        break;
-                    case Side.Bottom:
-                        newPos = this.linkedPortal.transform.position;
-                        break;
-                    case Side.Left:
-                        newPos = this.linkedPortal.transform.position + new Vector3(triggerCollider.transform.localPosition.x, 0f, 0f);
-                        break;
-                    default:
-                        newPos = Vector3.zero; break;
-                }
-                break;
-            case Side.Right:
-                switch (GhostMovement.calc[1])
-                {
-                    case Side.Right:
-                        newPos = this.linkedPortal.transform.position + new Vector3(triggerCollider.transform.localPosition.x, 0f, 0f);
-                        break;
-                    case Side.Top:
-                        newPos = this.linkedPortal.transform.position;
-                        break;
-                    case Side.Bottom:
-                        newPos = this.linkedPortal.transform.position;
-                        break;
-                    case Side.Left:
-                        newPos = this.linkedPortal.transform.position - new Vector3(triggerCollider.transform.localPosition.x, 0f, 0f);
-                        break;
-                    default:
-                        newPos = Vector3.zero; break;
-                }
-                break;
-            case Side.Bottom:
-                switch (GhostMovement.calc[1])
-                {
-                    case Side.Right:
-                        newPos = this.linkedPortal.transform.position - new Vector3(playerObj.transform.Find("PortalTriggerRight").localPosition.x, 0f, 0f);
-                        break;
-                    case Side.Top:
-                        newPos = this.linkedPortal.transform.position;
-                        break;
-                    case Side.Bottom:
-                        newPos = this.linkedPortal.transform.position;
-                        break;
-                    case Side.Left:
-                        newPos = this.linkedPortal.transform.position - new Vector3(playerObj.transform.Find("PortalTriggerLeft").localPosition.x, 0f, 0f);
-                        break;
-                    default:
-                        newPos = Vector3.zero; break;
-                }
-                break;
-            case Side.Top:
-                switch (GhostMovement.calc[1])
-                {
-                    case Side.Right:
-                        newPos = this.linkedPortal.transform.position - new Vector3(playerObj.transform.Find("PortalTriggerRight").localPosition.x, 0f, 0f);
-                        break;
-                    case Side.Top:
-                        newPos = this.linkedPortal.transform.position;
-                        break;
-                    case Side.Bottom:
-                        newPos = this.linkedPortal.transform.position + new Vector3(0f, MathF.Abs(triggerCollider.transform.localPosition.y), 0f);
-                        break;
-                    case Side.Left:
-                        newPos = this.linkedPortal.transform.position - new Vector3(playerObj.transform.Find("PortalTriggerLeft").localPosition.x, 0f, 0f);
-                        break;
-                    default:
-                        newPos = Vector3.zero; break;
-                }
-                break;
-            default:
-                newPos = Vector3.zero; break;
-
-        }
-
-
-        if (rb != null)
-        {
-            rb.position = newPos;
-            Physics2D.SyncTransforms();
-        }
-
-        Vector2 newVelocity = oldVelocity;
-
-
-        if (GhostMovement.calc[0] == Side.Left)
-        {
-            if (GhostMovement.calc[1] == Side.Bottom)
-            {
-                newVelocity.y = Mathf.Abs(oldVelocity.x) + 10f;
-            }
-            else if (GhostMovement.calc[1] == Side.Left)
-            {
-                newVelocity.x = -oldVelocity.x;
-            }
-        }
-        else if (GhostMovement.calc[0] == Side.Right)
-        {
-            if (GhostMovement.calc[1] == Side.Bottom)
-            {
-                newVelocity.y = Mathf.Abs(oldVelocity.x) + 10f;
-            }
-            else if (GhostMovement.calc[1] == Side.Right)
-            {
-                newVelocity.x = -oldVelocity.x;
-            }
-        }
-        else if (GhostMovement.calc[0] == Side.Bottom)
-        {
-            if (GhostMovement.calc[1] == Side.Bottom)
-            {
-                newVelocity.y = -oldVelocity.y;
-                newVelocity.x = 0f;
-            }
-            else if (GhostMovement.calc[1] == Side.Left)
-            {
-                newVelocity.x = -oldVelocity.y;
-                newVelocity.y = 0;
-            }
-            else if (GhostMovement.calc[1] == Side.Right)
-            {
-                newVelocity.x = oldVelocity.y;
-                newVelocity.y = 0;
-            }
-        }
-        else if (GhostMovement.calc[0] == Side.Top)
-        {
-            if (GhostMovement.calc[1] == Side.Top)
-            {
-                newVelocity.y = -oldVelocity.y;
-            }
-            else if (GhostMovement.calc[1] == Side.Left)
-            {
-                newVelocity.x = oldVelocity.y;
-                newVelocity.y = 0;
-            }
-            else if (GhostMovement.calc[1] == Side.Right)
-            {
-                newVelocity.x = -oldVelocity.y;
-                newVelocity.y = 0;
-            }
-        }
-
-
-        PlayerMovement pMovement = playerObj.GetComponent<PlayerMovement>();
-        if (pMovement != null)
-        {
-            pMovement.JustTeleported();
-        }
-
-        // Телепортируем куб, если он на руках у игрока
-        if (pMovement != null && pMovement.carriedCube != null)
-        {
-            Vector3 cubeTargetPos = pMovement.cubeHoldPoint.position;
-            Quaternion cubeTargetRot = pMovement.cubeHoldPoint.rotation;
-            pMovement.carriedCube.TeleportWithHolder(cubeTargetPos, cubeTargetRot);
-        }
-
-        StartCoroutine(ApplyVelocityAfterFixed(rb, newVelocity));
-
-        if (this.side != this.linkedPortal.side)
-        {
-            StartCoroutine(ReenableWallsAfterFixed(playerObj, GetWallCollidersBySide(this.side)));
-        }
-        else
-        {
-            unlock = false;
-        }
-    }
-
-    
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (this.linkedPortal != null)
+        if (linkedPortal != null)
         {
-            range = this.linkedPortal.transform.position - this.transform.position;
+            range = linkedPortal.transform.position - this.transform.position;
             if (other.CompareTag("Player"))
             {
+<<<<<<< Updated upstream
+                GhostMovement.offset = range;
+=======
                 GhostMovement.calc[0] = this.side;
                 GhostMovement.calc[1] = this.linkedPortal.side;
                 if ((this.side == Side.Left && this.linkedPortal.side == Side.Right) || (this.side == Side.Right && this.linkedPortal.side == Side.Left) || (this.side == Side.Top && this.linkedPortal.side == Side.Bottom) || (this.side == Side.Bottom && this.linkedPortal.side == Side.Top))
@@ -378,14 +76,18 @@ public class Portal : MonoBehaviour
                 }
 
                 PlayerMovement.isInPortal = true;
-                PlayerMovement.linked= this.linkedPortal;
+                PlayerMovement.linked = this.linkedPortal;
+>>>>>>> Stashed changes
             }
-
-
             if (other.CompareTag("PortalTrigger"))
             {
+<<<<<<< Updated upstream
+                other.GetComponentInParent<CapsuleCollider2D>().gameObject.transform.position += Vector3.right * 0.11f + range;
+                Debug.Log($"Portal at {linkedPortal.transform.position} | Teleported at: {other.transform.position}");
+=======
                 if ((other.gameObject.name == "PortalTriggerLeft" && this.side == Side.Right) || (other.gameObject.name == "PortalTriggerRight" && this.side == Side.Left) || (other.gameObject.name == "PortalTriggerBott" && this.side == Side.Top) || (other.gameObject.name == "PortalTriggerTop" && this.side == Side.Bottom))
                 {
+                    portalSound.Play();
                     TeleportPlayer(other);
                     Debug.Log($"Portal at {this.linkedPortal.transform.position} | Teleported at: {other.transform.position}");
                     Debug.Log($"Unlock {unlock}");
@@ -437,60 +139,77 @@ public class Portal : MonoBehaviour
                 }
             }
 
-            // Если это куб на земле
+            // Если это куб
             if (other.CompareTag("Cube"))
             {
-                Cube cube = other.GetComponent<Cube>();
-                if (cube != null && !cube.isPickedUp && linkedPortal != null)
-                {
-                    Vector2 size = cube.GetComponent<Collider2D>().bounds.size;
-                    Vector3 cubeOffset = Vector3.zero;
-
-                    switch (linkedPortal.side)
-                    {
-                        case Side.Left:
-                            cubeOffset = new Vector3(-size.x / 2, 0, 0);
-                            break;
-                        case Side.Right:
-                            cubeOffset = new Vector3(size.x / 2, 0, 0);
-                            break;
-                        case Side.Top:
-                            cubeOffset = new Vector3(0, size.y / 2, 0);
-                            break;
-                        case Side.Bottom:
-                            cubeOffset = new Vector3(0, -size.y / 2, 0);
-                            break;
-                    }
-
-                    Vector3 targetPos = linkedPortal.transform.position + cubeOffset;
-                    cube.TeleportWithHolder(targetPos, cube.transform.rotation);
-                } 
+                TeleportCube(other);
             }
         }
     }
 
-
-    private void TeleportCube(Cube cube)
+    private void TeleportCube(Collider2D cubeCollider)
     {
-        if (cube == null || linkedPortal == null) return;
+        if (cubeCollider == null || linkedPortal == null) return;
+
+        Cube cube = cubeCollider.GetComponent<Cube>();
+        if (cube == null || cube.isPickedUp) return;
 
         Rigidbody2D rb = cube.GetComponent<Rigidbody2D>();
-        Vector2 oldVelocity = rb.velocity;
+        if (rb == null) return;
 
-        // Рассчитываем новую позицию относительно портала
-        Vector3 newPos = linkedPortal.transform.position + (cube.transform.position - transform.position);
+        // Вычисляем смещение для выхода из портала
+        Vector3 exitOffset = Vector3.zero;
+        float exitDistance = 0.5f; // Небольшое расстояние от портала
 
+        // Определяем направление выхода в зависимости от стороны портала
+        switch (linkedPortal.side)
+        {
+            case Side.Right:
+                exitOffset = Vector3.left * exitDistance;
+                break;
+            case Side.Left:
+                exitOffset = Vector3.right * exitDistance;
+                break;
+            case Side.Top:
+                exitOffset = Vector3.down * exitDistance;
+                break;
+            case Side.Bottom:
+                exitOffset = Vector3.up * exitDistance;
+                break;
+        }
+
+        // Телепортируем куб на позицию выходного портала со смещением
+        Vector3 newPos = linkedPortal.transform.position + exitOffset;
         rb.position = newPos;
+
+        // Синхронизируем физику
         Physics2D.SyncTransforms();
 
-        // Можно скорректировать скорость куба так же, как у игрока, если нужно
-        rb.velocity = oldVelocity;
+        // Если выходной портал снизу - добавляем вертикальный импульс "выплевывания"
+        if (linkedPortal.side == Side.Bottom)
+        {
+            // Добавляем импульс вверх
+            float upwardForce = 10f; // Сила выброса
+            float force = upwardForce > Math.Abs(rb.velocity.y) ? upwardForce : Math.Abs(rb.velocity.y);
+            rb.velocity = new Vector2(rb.velocity.x, force);
+
+            // Можно также добавить небольшой рандомный горизонтальный разброс
+            //float minHorizontalSpread = 4f;
+            //float maxHorizontalSpread = 7f;
+            //float randomX = UnityEngine.Random.Range(minHorizontalSpread, maxHorizontalSpread);
+            //int sign = UnityEngine.Random.Range(0, 2) == 0 ? -1 : 1;
+            //rb.velocity = new Vector2(randomX * sign, rb.velocity.y);
+
+            Debug.Log($"Cube spat out from bottom portal with force: {rb.velocity}");
+        }
+
+        Debug.Log($"Cube teleported from {transform.position} to {newPos} via portal");
     }
 
     private void OnTriggerStay2D(Collider2D other)
     {
         if (GhostMovement.calc[0] != Side.Default && other.name == "RealPlayer")
-        { 
+        {
             Vector3 range = this.linkedPortal.transform.position - this.transform.position;
             Vector3 rangePlayer = this.linkedPortal.transform.position - other.transform.position;
             if (this.side == Side.Right)
@@ -517,7 +236,7 @@ public class Portal : MonoBehaviour
                     GhostMovement.offset = new Vector3(range.x + 2f * offset, range.y);
                 }
             }
-            else if (this.side == Side.Left) 
+            else if (this.side == Side.Left)
             {
                 if (this.linkedPortal.side == Side.Top)
                 {
@@ -588,6 +307,7 @@ public class Portal : MonoBehaviour
                     Vector3 offset = this.transform.position - other.transform.position;
                     GhostMovement.offset = new Vector3(range.x + offset.x, range.y + 2f * offset.y);
                 }
+>>>>>>> Stashed changes
             }
         }
     }
@@ -595,38 +315,11 @@ public class Portal : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        if (other == null) return;
-
-        if (other.name == "RealPlayer" && this.linkedPortal != null)
-        {
+        if (other.CompareTag("Player") && linkedPortal != null)
             GhostMovement.offset = Vector3.up * 25;
-        }
-
-        if (!string.IsNullOrEmpty(other.tag) && other.tag.Length > 17 && other.tag.StartsWith("PortalWallTrigger") && unlock)
-        {
-            if (other.tag.Substring(17, 1) == "V")
-                activeVerticalTriggers.Remove(other.gameObject);
-            else
-                activeHorizontalTriggers.Remove(other.gameObject);
-
-            if (activeVerticalTriggers.Count < 2)
-            {
-                GameObject playerObj = other.transform.parent != null
-                                       ? other.transform.parent.gameObject
-                                       : other.GetComponentInParent<Collider2D>()?.gameObject;
-
-                if (playerObj != null)
-                {
-                    Collider2D[] walls = GetWallCollidersBySide(this.side);
-                    ReenableWallCollisionsForPlayer(playerObj, walls);
-                }
-
-                Debug.Log("Wall phasing DISABLED");
-            }
-        }
-        if (other.CompareTag("Player"))
-            unlock = true;
-        if (!other.CompareTag("PortalTrigger"))
-            PlayerMovement.isInPortal = false;
     }
+
+
+
+
 }
