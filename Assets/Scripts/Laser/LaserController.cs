@@ -5,7 +5,7 @@ using UnityEngine;
 public class LaserController : MonoBehaviour
 {
     [SerializeField] private AudioSource laserSound;
-    public LaserClone laserGunClone; // Изменяем тип на LaserClone
+    public LaserClone laserGunClone; 
     public LineRenderer lineRenderer;
     public float rotationSpeed = 30f;
     public float laserLength = 50f;

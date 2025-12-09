@@ -4,17 +4,19 @@ using UnityEngine;
 
 public class Button : MonoBehaviour
 {
+    [SerializeField] private AudioSource buttonSound;
     public Transform baseTopPoint;
     public Transform baseBottomPoint;
     public float pressSpeedUp = 2f;
     public bool isPressed = false;
+    public bool isSoundPlaying = false;
 
-    //private int objectsOnButton = 0;
     private Rigidbody2D rb;
     private float minSpeed = 2f;
 
     void Start()
     {
+        buttonSound.Stop();
         transform.position = baseTopPoint.position;
     }
 
@@ -29,28 +31,24 @@ public class Button : MonoBehaviour
             {
                 isPressed = true;
                 rb = hit.attachedRigidbody;
-                break; // берём первый объект
+                break;
             }
         }
 
         if (isPressed)
         {
+            if (!isSoundPlaying) buttonSound.Play();
+            isSoundPlaying = true;
             float pressSpeedDown = rb != null ? Mathf.Max(Mathf.Abs(rb.velocity.y), minSpeed) : minSpeed;
             if (transform.position.y > baseBottomPoint.position.y)
                 MoveTowards(baseBottomPoint.position, pressSpeedDown);
         }
         else
+        {
+            isSoundPlaying = false;
             MoveTowards(baseTopPoint.position, pressSpeedUp);
+        }
     }
-    //if (isPressed)
-    //{
-    //    float pressSpeedDown = rb != null ? Mathf.Max(Mathf.Abs(rb.velocity.y), minSpeed) : minSpeed;
-    //    if (transform.position.y > baseBottomPoint.position.y)
-    //        MoveTowards(baseBottomPoint.position, pressSpeedDown);
-    //}
-    //else
-    //    MoveTowards(baseTopPoint.position, pressSpeedUp);
-
 
     void MoveTowards(Vector3 target, float speed)
     {
@@ -61,29 +59,3 @@ public class Button : MonoBehaviour
         );
     }
 }
-//    private void OnTriggerStay2D(Collider2D col)
-//    {
-//        if (col.CompareTag("Cube") || col.CompareTag("Player"))
-//        {
-//            //objectsOnButton++;
-//            isPressed = true;
-//            if (rb ==  null)
-//                rb = col.GetComponent<Rigidbody2D>();
-//        }
-//    }
-
-//    private void OnTriggerExit2D(Collider2D col)
-//    {
-//        if (col.CompareTag("Cube") || col.CompareTag("Player"))
-//        {
-//            //objectsOnButton--;
-
-//            //if (objectsOnButton <= 0)
-//            //{
-//            //    objectsOnButton = 0;
-//            isPressed = false;
-//            rb = null;
-//            //}
-//        }
-//    }
-//}

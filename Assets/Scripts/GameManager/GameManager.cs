@@ -11,20 +11,17 @@ public class GameManager : MonoBehaviour
     public static bool gameIsFinished = false;
     public static bool gameIsPaused = false;
     public static bool gameIsEnded = false;
-<<<<<<< Updated upstream
-=======
     public static GameManager Instance;
     public GameObject finishPanel;
->>>>>>> Stashed changes
     public GameObject pausePanel;
     public GameObject endPanel;
 
     void Start()
     {
+        Time.timeScale = 1f;
         FinishLevelSound.Stop();
         ButtonSound.Stop();
         DeathSound.Stop();
-        Time.timeScale = 1f;
         gameIsFinished = false;
         gameIsPaused = false;
         gameIsEnded = false;
@@ -41,6 +38,12 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape) && !gameIsEnded && !gameIsFinished)
         if (gameIsPaused) ResumeGame();
         else PauseGame();
+    }
+
+    void Awake()
+    {
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
     }
 
     public void ResumeGame()
@@ -65,8 +68,11 @@ public class GameManager : MonoBehaviour
     {
         ButtonSound.Play();
         Time.timeScale = 1f;
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        foreach (var player in players) if (player != null) player.transform.parent = null;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
+
     public void NextLevel()
     {
         ButtonSound.Play();
