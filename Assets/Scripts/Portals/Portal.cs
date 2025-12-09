@@ -1,4 +1,4 @@
-using System;
+п»їusing System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Burst.Intrinsics;
@@ -9,6 +9,7 @@ using UnityEngine.SocialPlatforms;
 
 public class Portal : MonoBehaviour
 {
+    [SerializeField] private AudioSource portalSound;
     public Portal linkedPortal;
     public bool isBlue = true;
     public static HashSet<GameObject> activeVerticalTriggers = new HashSet<GameObject>();
@@ -30,6 +31,7 @@ public class Portal : MonoBehaviour
 
     void Start()
     {
+        portalSound.Stop();
         CreateChildrenIfMissing();
 
         Transform blueChild = transform.Find("PortalBlue");
@@ -151,6 +153,7 @@ public class Portal : MonoBehaviour
 
     private void TeleportPlayer(Collider2D triggerCollider)
     {
+        portalSound.Play();
         if (triggerCollider == null || this.linkedPortal == null) return;
 
         GameObject playerObj = triggerCollider.transform.parent != null
@@ -342,7 +345,7 @@ public class Portal : MonoBehaviour
             pMovement.JustTeleported();
         }
 
-        // Телепортируем куб, если он на руках у игрока
+        // Г’ГҐГ«ГҐГЇГ®Г°ГІГЁГ°ГіГҐГ¬ ГЄГіГЎ, ГҐГ±Г«ГЁ Г®Г­ Г­Г  Г°ГіГЄГ Гµ Гі ГЁГЈГ°Г®ГЄГ 
         if (pMovement != null && pMovement.carriedCube != null)
         {
             Vector3 cubeTargetPos = pMovement.cubeHoldPoint.position;
@@ -362,7 +365,7 @@ public class Portal : MonoBehaviour
         }
     }
 
-    
+
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (this.linkedPortal != null)
@@ -378,7 +381,7 @@ public class Portal : MonoBehaviour
                 }
 
                 PlayerMovement.isInPortal = true;
-                PlayerMovement.linked= this.linkedPortal;
+                PlayerMovement.linked = this.linkedPortal;
             }
 
 
@@ -437,60 +440,71 @@ public class Portal : MonoBehaviour
                 }
             }
 
-            // Если это куб на земле
+            // Г…Г±Г«ГЁ ГЅГІГ® ГЄГіГЎ Г­Г  Г§ГҐГ¬Г«ГҐ
             if (other.CompareTag("Cube"))
             {
-                Cube cube = other.GetComponent<Cube>();
-                if (cube != null && !cube.isPickedUp && linkedPortal != null)
-                {
-                    Vector2 size = cube.GetComponent<Collider2D>().bounds.size;
-                    Vector3 cubeOffset = Vector3.zero;
-
-                    switch (linkedPortal.side)
-                    {
-                        case Side.Left:
-                            cubeOffset = new Vector3(-size.x / 2, 0, 0);
-                            break;
-                        case Side.Right:
-                            cubeOffset = new Vector3(size.x / 2, 0, 0);
-                            break;
-                        case Side.Top:
-                            cubeOffset = new Vector3(0, size.y / 2, 0);
-                            break;
-                        case Side.Bottom:
-                            cubeOffset = new Vector3(0, -size.y / 2, 0);
-                            break;
-                    }
-
-                    Vector3 targetPos = linkedPortal.transform.position + cubeOffset;
-                    cube.TeleportWithHolder(targetPos, cube.transform.rotation);
-                } 
+                TeleportCube(other);
             }
         }
     }
 
 
-    private void TeleportCube(Cube cube)
+    private void TeleportCube(Collider2D cubeCollider)
     {
-        if (cube == null || linkedPortal == null) return;
+        if (cubeCollider == null || linkedPortal == null) return;
+
+        Cube cube = cubeCollider.GetComponent<Cube>();
+        if (cube == null || cube.isPickedUp) return;
 
         Rigidbody2D rb = cube.GetComponent<Rigidbody2D>();
-        Vector2 oldVelocity = rb.velocity;
+        if (rb == null) return;
 
-        // Рассчитываем новую позицию относительно портала
-        Vector3 newPos = linkedPortal.transform.position + (cube.transform.position - transform.position);
+        Vector3 exitOffset = Vector3.zero;
+        float exitDistance = 0.5f;
 
+        switch (linkedPortal.side)
+        {
+            case Side.Right:
+                exitOffset = Vector3.left * exitDistance;
+                break;
+            case Side.Left:
+                exitOffset = Vector3.right * exitDistance;
+                break;
+            case Side.Top:
+                exitOffset = Vector3.down * exitDistance;
+                break;
+            case Side.Bottom:
+                exitOffset = Vector3.up * exitDistance;
+                break;
+        }
+
+        Vector3 newPos = linkedPortal.transform.position + exitOffset;
         rb.position = newPos;
+
         Physics2D.SyncTransforms();
 
-        // Можно скорректировать скорость куба так же, как у игрока, если нужно
-        rb.velocity = oldVelocity;
+        if (linkedPortal.side == Side.Bottom)
+        {
+            float upwardForce = 10f; 
+            float force = upwardForce > Math.Abs(rb.velocity.y) ? upwardForce : Math.Abs(rb.velocity.y);
+            rb.velocity = new Vector2(rb.velocity.x, force);
+
+            //float minHorizontalSpread = 4f;
+            //float maxHorizontalSpread = 7f;
+            //float randomX = UnityEngine.Random.Range(minHorizontalSpread, maxHorizontalSpread);
+            //int sign = UnityEngine.Random.Range(0, 2) == 0 ? -1 : 1;
+            //rb.velocity = new Vector2(randomX * sign, rb.velocity.y);
+
+            Debug.Log($"Cube spat out from bottom portal with force: {rb.velocity}");
+        }
+
+        Debug.Log($"Cube teleported from {transform.position} to {newPos} via portal");
     }
 
     private void OnTriggerStay2D(Collider2D other)
     {
         if (GhostMovement.calc[0] != Side.Default && other.name == "RealPlayer")
-        { 
+        {
             Vector3 range = this.linkedPortal.transform.position - this.transform.position;
             Vector3 rangePlayer = this.linkedPortal.transform.position - other.transform.position;
             if (this.side == Side.Right)
@@ -517,7 +531,7 @@ public class Portal : MonoBehaviour
                     GhostMovement.offset = new Vector3(range.x + 2f * offset, range.y);
                 }
             }
-            else if (this.side == Side.Left) 
+            else if (this.side == Side.Left)
             {
                 if (this.linkedPortal.side == Side.Top)
                 {

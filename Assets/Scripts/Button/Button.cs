@@ -4,16 +4,19 @@ using UnityEngine;
 
 public class Button : MonoBehaviour
 {
+    [SerializeField] private AudioSource buttonSound;
     public Transform baseTopPoint;
     public Transform baseBottomPoint;
     public float pressSpeedUp = 2f;
     public bool isPressed = false;
+    public bool isSoundPlaying = false;
 
     private Rigidbody2D rb;
     private float minSpeed = 2f;
 
     void Start()
     {
+        buttonSound.Stop();
         transform.position = baseTopPoint.position;
     }
 
@@ -34,12 +37,17 @@ public class Button : MonoBehaviour
 
         if (isPressed)
         {
+            if (!isSoundPlaying) buttonSound.Play();
+            isSoundPlaying = true;
             float pressSpeedDown = rb != null ? Mathf.Max(Mathf.Abs(rb.velocity.y), minSpeed) : minSpeed;
             if (transform.position.y > baseBottomPoint.position.y)
                 MoveTowards(baseBottomPoint.position, pressSpeedDown);
         }
         else
+        {
+            isSoundPlaying = false;
             MoveTowards(baseTopPoint.position, pressSpeedUp);
+        }
     }
 
     void MoveTowards(Vector3 target, float speed)

@@ -34,7 +34,7 @@ public class PlayerMovement : MonoBehaviour
     private int teleportFrames = 3;
 
     [Header("Cube Pickup")]
-    public Transform cubeHoldPoint;   
+    public Transform cubeHoldPoint;
     public float pickupRange = 4f;
     public KeyCode pickupKey = KeyCode.E;
     public Cube carriedCube;
@@ -195,7 +195,7 @@ public class PlayerMovement : MonoBehaviour
             if (col.CompareTag("Cube"))
             {
                 Cube cube = col.GetComponent<Cube>();
-                if (cube != null && cube.isPickable && !cube.isPickedUp)
+                if (cube != null && !cube.isPickedUp)
                 {
                     PickupCube(cube);
                     break;

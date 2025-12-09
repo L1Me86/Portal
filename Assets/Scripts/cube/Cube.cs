@@ -3,7 +3,8 @@ using System.Collections;
 
 public class Cube : MonoBehaviour
 {
-    public bool isPickable = true;
+    [SerializeField] private AudioSource impactSound;
+    [SerializeField] private AudioSource cubeMusic;
     public bool isPickedUp = false;
     public Transform holder;
     public PlayerMovement player;
@@ -23,6 +24,8 @@ public class Cube : MonoBehaviour
 
     void Start()
     {
+        impactSound.Stop();
+        cubeMusic.Stop();
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
@@ -106,8 +109,7 @@ public class Cube : MonoBehaviour
 
     public void PickUp(Transform newHolder)
     {
-        if (!isPickable || isPickedUp) return;
-
+        cubeMusic.Play();
         isPickedUp = true;
         holder = newHolder;
 
@@ -118,11 +120,11 @@ public class Cube : MonoBehaviour
 
         foreach (var pcol in playerCols)
             Physics2D.IgnoreCollision(pcol, col, true);
-
     }
 
     public void Drop()
     {
+        cubeMusic.Stop();
         if (!isPickedUp) return;
 
         isPickedUp = false;
@@ -151,8 +153,16 @@ public class Cube : MonoBehaviour
         rb.rotation = rot.eulerAngles.z;
         Physics2D.SyncTransforms();
 
-        yield return null; // ждём один кадр
+        yield return null;
 
-        rb.isKinematic = true; // оставляем киниматик, если куб на руках
+        rb.isKinematic = true;
+    }
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (!isPickedUp)
+        {
+            float impactStrength = collision.relativeVelocity.magnitude;
+            if (impactStrength > 2f) impactSound.Play();
+        }
     }
 }

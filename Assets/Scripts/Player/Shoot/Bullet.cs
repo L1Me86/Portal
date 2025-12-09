@@ -1,10 +1,12 @@
 using System.Numerics;
 using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Rendering;
 
 public class Bullet : MonoBehaviour
 {
+    [SerializeField] private AudioSource bulletSound;
     public GameObject portalPrefab;
     public Collider2D playerCollider;
     public GameObject player;
@@ -13,6 +15,7 @@ public class Bullet : MonoBehaviour
 
     void Start()
     {
+        bulletSound.Stop();
         if (!player.GetComponent<PlayerMovement>().canPickup)
         {
             Destroy(gameObject);
@@ -59,14 +62,16 @@ public class Bullet : MonoBehaviour
                     if (Mathf.Max(colliderSizeY, colliderSizeX) < portalSize * 2f)
                     {
                         Destroy(gameObject);
+                        bulletSound.Play();
                         return;
                     }
                     else
                     {
                         bool onTop = port.transform.rotation != new UnityEngine.Quaternion(0, 0, 0, 0) ? true : false;
-                        if (Mathf.Abs(onTop ? (collider.transform.position.x - port.transform.position.x) : (collider.transform.position.y - port.transform.position.y)) + Mathf.Max(colliderSizeX, colliderSizeY) - portalSize < portalSize * 2f )
+                        if (Mathf.Abs(onTop ? (collider.transform.position.x - port.transform.position.x) : (collider.transform.position.y - port.transform.position.y)) + Mathf.Max(colliderSizeX, colliderSizeY) - portalSize < portalSize * 2f)
                         {
                             Destroy(gameObject);
+                            bulletSound.Play();
                             return;
                         }
                     }

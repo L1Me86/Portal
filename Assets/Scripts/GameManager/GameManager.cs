@@ -5,24 +5,37 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+    [SerializeField] private AudioSource FinishLevelSound;
+    [SerializeField] private AudioSource ButtonSound;
+    [SerializeField] private AudioSource DeathSound;
+    public static bool gameIsFinished = false;
     public static bool gameIsPaused = false;
     public static bool gameIsEnded = false;
     public static GameManager Instance;
+    public GameObject finishPanel;
     public GameObject pausePanel;
+    public GameObject endPanel;
 
     void Start()
     {
         Time.timeScale = 1f;
+        FinishLevelSound.Stop();
+        ButtonSound.Stop();
+        DeathSound.Stop();
+        gameIsFinished = false;
         gameIsPaused = false;
         gameIsEnded = false;
+        if (finishPanel != null) finishPanel.SetActive(false);
         if (pausePanel != null) pausePanel.SetActive(false);
+        if (endPanel != null) endPanel.SetActive(false);
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Q) && gameIsPaused) QuitGame();
-        if (Input.GetKeyDown(KeyCode.R) && gameIsPaused) RestartGame();
-        if (Input.GetKeyDown(KeyCode.Escape) && !gameIsEnded)
+        if (Input.GetKeyDown(KeyCode.R)) RestartGame();
+        if (Input.GetKeyDown(KeyCode.N) && gameIsFinished) NextLevel();
+        if (Input.GetKeyDown(KeyCode.Q) && (gameIsPaused || gameIsEnded || gameIsFinished)) QuitGame();
+        if (Input.GetKeyDown(KeyCode.Escape) && !gameIsEnded && !gameIsFinished)
         if (gameIsPaused) ResumeGame();
         else PauseGame();
     }
@@ -34,7 +47,8 @@ public class GameManager : MonoBehaviour
     }
 
     public void ResumeGame()
-    {
+    {   
+        ButtonSound.Play();
         gameIsPaused = false;
         Time.timeScale = 1f;
         if (pausePanel != null) pausePanel.SetActive(false);
@@ -43,6 +57,7 @@ public class GameManager : MonoBehaviour
 
     public void PauseGame()
     {
+        ButtonSound.Play();
         gameIsPaused = true;
         Time.timeScale = 0f;
         if (pausePanel != null) pausePanel.SetActive(true);
@@ -51,22 +66,42 @@ public class GameManager : MonoBehaviour
 
     public void RestartGame()
     {
+        ButtonSound.Play();
         Time.timeScale = 1f;
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        foreach (var player in players) if (player != null) player.transform.parent = null;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    public void NextLevel()
+    {
+        ButtonSound.Play();
+        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        SceneManager.LoadScene((currentSceneIndex + 1) % SceneManager.sceneCountInBuildSettings);
     }
 
     public void QuitGame()
     {
-        Debug.Log("Выход из игры...");
-        Application.Quit();
-        #if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-        #endif
+        ButtonSound.Play();
+        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        SceneManager.LoadScene(0);
     }
 
     public void EndGame()
     {
+        if (!gameIsEnded) DeathSound.Play();
         gameIsEnded = true;
-        PauseGame();
+        Time.timeScale = 0f;
+        if (endPanel != null) endPanel.SetActive(true);
+        Debug.Log("Уровень не пройден");
+    }
+
+    public void FinishGame()
+    {
+        if (!gameIsFinished) FinishLevelSound.Play();
+        gameIsFinished = true;
+        Time.timeScale = 0f;
+        if (finishPanel != null) finishPanel.SetActive(true);
+        Debug.Log("Уровень пройден");
     }
 }

@@ -60,7 +60,7 @@ public class MovingPlatform : MonoBehaviour
         lastPosition = transform.position;
     }
 
-    void MovePlatformFixed()
+    public void MovePlatformFixed()
     {
         if (pointA == null || pointB == null) return;
 
