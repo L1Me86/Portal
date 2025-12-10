@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class Settings : MonoBehaviour
 {
+    public int fps;
+
     // Start is called before the first frame update
     void Start()
     {
-        Application.targetFrameRate = 360;
+        Application.targetFrameRate = fps;
     }
 
     // Update is called once per frame

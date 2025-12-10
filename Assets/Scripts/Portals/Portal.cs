@@ -2,10 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Burst.Intrinsics;
+using Unity.Mathematics;
 using Unity.VisualScripting;
-using UnityEditor.Build;
 using UnityEngine;
 using UnityEngine.SocialPlatforms;
+using static Unity.VisualScripting.Member;
 
 public class Portal : MonoBehaviour
 {
@@ -482,10 +483,11 @@ public class Portal : MonoBehaviour
         rb.position = newPos;
 
         Physics2D.SyncTransforms();
+        rb.velocity = new Vector2(rb.velocity.x, Math.Max(-39, rb.velocity.y));
 
         if (linkedPortal.side == Side.Bottom)
         {
-            float upwardForce = 10f; 
+            float upwardForce = 10f;
             float force = upwardForce > Math.Abs(rb.velocity.y) ? upwardForce : Math.Abs(rb.velocity.y);
             rb.velocity = new Vector2(rb.velocity.x, force);
 
