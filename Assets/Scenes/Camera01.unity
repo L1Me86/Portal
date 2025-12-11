@@ -4872,7 +4872,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1448044589}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: QuitGame
+        m_MethodName: ToMainMenu
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6324,6 +6324,7 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3419168822478345490, guid: 1e41b4a76b0f17e458677a5b9de0ece8, type: 3}
   m_PrefabInstance: {fileID: 218197323}
   m_PrefabAsset: {fileID: 0}
+<<<<<<< Updated upstream
 --- !u!1 &946907679
 GameObject:
   m_ObjectHideFlags: 0
@@ -6368,6 +6369,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46be774ea8338a44bbd2285292e4e532, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+=======
+>>>>>>> Stashed changes
 --- !u!1001 &948888284
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7670,7 +7673,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1448044589}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: QuitGame
+        m_MethodName: ToMainMenu
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -9313,7 +9316,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1448044589}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: QuitGame
+        m_MethodName: ToMainMenu
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -15074,7 +15077,6 @@ SceneRoots:
   m_Roots:
   - {fileID: 1237834131}
   - {fileID: 519420032}
-  - {fileID: 946907680}
   - {fileID: 1459662045}
   - {fileID: 679624723}
   - {fileID: 1448044588}

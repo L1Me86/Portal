@@ -3929,7 +3929,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1448044589}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: QuitGame
+        m_MethodName: ToMainMenu
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5689,7 +5689,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3419168822478345490, guid: 7ae45acc038e45e43942c4697388840a, type: 3}
   m_PrefabInstance: {fileID: 937210629}
   m_PrefabAsset: {fileID: 0}
+<<<<<<< Updated upstream
 --- !u!1 &946907679
+=======
+--- !u!1 &957898791
+>>>>>>> Stashed changes
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5697,21 +5701,32 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
+<<<<<<< Updated upstream
   - component: {fileID: 946907680}
   - component: {fileID: 946907681}
   m_Layer: 0
   m_Name: Settings
+=======
+  - component: {fileID: 957898792}
+  m_Layer: 0
+  m_Name: Laser
+>>>>>>> Stashed changes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+<<<<<<< Updated upstream
 --- !u!4 &946907680
+=======
+--- !u!4 &957898792
+>>>>>>> Stashed changes
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
+<<<<<<< Updated upstream
   m_GameObject: {fileID: 946907679}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -5733,6 +5748,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46be774ea8338a44bbd2285292e4e532, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+=======
+  m_GameObject: {fileID: 957898791}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -2.7103932, y: 20.081972, z: -2.1470282}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1920131561}
+  - {fileID: 1291741091}
+  - {fileID: 1743962426}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+>>>>>>> Stashed changes
 --- !u!1001 &960997057
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10881,7 +10910,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1448044589}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: QuitGame
+        m_MethodName: ToMainMenu
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -12390,7 +12419,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1448044589}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: QuitGame
+        m_MethodName: ToMainMenu
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -13174,7 +13203,11 @@ SceneRoots:
   m_Roots:
   - {fileID: 1237834131}
   - {fileID: 519420032}
+<<<<<<< Updated upstream
   - {fileID: 946907680}
+=======
+  - {fileID: 822351345}
+>>>>>>> Stashed changes
   - {fileID: 1459662045}
   - {fileID: 679624723}
   - {fileID: 1448044588}

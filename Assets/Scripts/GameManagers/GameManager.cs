@@ -37,7 +37,7 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.R)) RestartGame();
         if (Input.GetKeyDown(KeyCode.N) && gameIsFinished) NextLevel();
-        if (Input.GetKeyDown(KeyCode.Q) && (gameIsPaused || gameIsEnded || gameIsFinished)) QuitGame();
+        if (Input.GetKeyDown(KeyCode.Q) && (gameIsPaused || gameIsEnded || gameIsFinished)) ToMainMenu();
         if (Input.GetKeyDown(KeyCode.Escape) && !gameIsEnded && !gameIsFinished)
         if (gameIsPaused) ResumeGame();
         else PauseGame();
@@ -71,13 +71,12 @@ public class GameManager : MonoBehaviour
     {
         ButtonSound.Play();
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        SceneManager.LoadScene((currentSceneIndex + 1) % SceneManager.sceneCountInBuildSettings);
+        SceneManager.LoadScene((currentSceneIndex + 1) % (SceneManager.sceneCountInBuildSettings - 1));
     }
 
-    public void QuitGame()
+    public void ToMainMenu()
     {
         ButtonSound.Play();
-        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         SceneManager.LoadScene(0);
     }
 

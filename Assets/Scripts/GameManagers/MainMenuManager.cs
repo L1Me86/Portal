@@ -4,6 +4,17 @@ using UnityEngine.UI;
 
 public class MainMenuManager : MonoBehaviour
 {
+<<<<<<< Updated upstream:Assets/Scripts/GameManager/MainMenuManager.cs
+=======
+    [SerializeField] private AudioSource ñlickSound;
+
+    private void Start()
+    {
+        ñlickSound.Stop();        
+        Application.targetFrameRate = PlayerPrefs.GetInt("SavedFPS", 60);
+    }
+
+>>>>>>> Stashed changes:Assets/Scripts/GameManagers/MainMenuManager.cs
     public void LoadLevel(int levelIndex)
     {
         if (levelIndex >= 0 && levelIndex < SceneManager.sceneCountInBuildSettings)
