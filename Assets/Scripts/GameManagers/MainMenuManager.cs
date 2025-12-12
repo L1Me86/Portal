@@ -8,7 +8,8 @@ public class MainMenuManager : MonoBehaviour
 
     private void Start()
     {
-        ñlickSound.Stop();
+        ñlickSound.Stop();        
+        Application.targetFrameRate = PlayerPrefs.GetInt("SavedFPS", 60);
     }
 
     public void LoadLevel(int levelIndex)

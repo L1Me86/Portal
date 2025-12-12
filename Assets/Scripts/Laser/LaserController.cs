@@ -12,6 +12,7 @@ public class LaserController : MonoBehaviour
 
     void Update()
     {
+        FindObjectOfType<MovingPlatform>().isLaserReceiverOn1 = false;
         RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.right, laserLength);
         lineRenderer.SetPosition(0, transform.position);
         RaycastHit2D currentHit = hit;
@@ -25,7 +26,7 @@ public class LaserController : MonoBehaviour
         if (currentHit.collider != null)
         {
             lineRenderer.SetPosition(1, currentHit.point);
-            if (currentHit.collider.CompareTag("LaserReceiver")) MakeAction();
+            if (currentHit.collider.CompareTag("LaserReceiver")) FindObjectOfType<MovingPlatform>().isLaserReceiverOn1 = true;
             if (currentHit.collider.CompareTag("Player")) FindObjectOfType<GameManager>().EndGame();
             if (currentHit.collider.CompareTag("Portal"))
             {
@@ -41,11 +42,6 @@ public class LaserController : MonoBehaviour
         {
             lineRenderer.SetPosition(1, transform.position + transform.right * laserLength);
         }
-    }
-
-    public void MakeAction()
-    {
-        FindObjectOfType<MovingPlatform>().MovePlatformFixed();
     }
 
     private void CreateClone(Portal exitPortal)
