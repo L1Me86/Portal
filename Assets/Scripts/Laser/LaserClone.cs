@@ -49,7 +49,7 @@ public class LaserClone : MonoBehaviour
         {
             lineRenderer.SetPosition(1, currentHit.point);
             if (currentHit.collider.CompareTag("Player")) FindObjectOfType<GameManager>().EndGame();
-            if (currentHit.collider.CompareTag("LaserReceiver")) MakeAction();
+            if (currentHit.collider.CompareTag("LaserReceiver")) FindObjectOfType<MovingPlatform>().isLaserReceiverOn2 = true;
         }
 
         else
@@ -94,13 +94,9 @@ public class LaserClone : MonoBehaviour
         }
     }
 
-    public void MakeAction()
-    {
-        FindObjectOfType<MovingPlatform>().MovePlatformFixed();
-    }
-
     void Update()
     {
+        FindObjectOfType<MovingPlatform>().isLaserReceiverOn2 = false;
         if (lineRenderer.enabled)
         {
             UpdateLaser();
