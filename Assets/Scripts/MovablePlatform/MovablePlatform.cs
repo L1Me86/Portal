@@ -83,40 +83,55 @@ public class MovingPlatform : MonoBehaviour
         {
             if (Vector3.Distance(transform.position, targetPoint) < 0.01f)
             {
-                portalTriggerCol.enabled = true;
+                if (portalTriggerCol != null)
+                {
+                    portalTriggerCol.enabled = true;
+                }
                 return;
             }
-            GameObject[] activePortals = GameObject.FindGameObjectsWithTag("Portal");
 
-            foreach (GameObject port in activePortals)
+            if (portalTriggerCol != null)
             {
-                if (port.GetComponent<Portal>().sitsOn == portalTriggerCol)
+                GameObject[] activePortals = GameObject.FindGameObjectsWithTag("Portal");
+
+                foreach (GameObject port in activePortals)
                 {
-                    port.GetComponent<Portal>().linkedPortal.Unlink();
-                    GameObject.Destroy(port);
+                    if (port.GetComponent<Portal>().sitsOn == portalTriggerCol)
+                    {
+                        port.GetComponent<Portal>().linkedPortal.Unlink();
+                        GameObject.Destroy(port);
+                    }
                 }
+                portalTriggerCol.enabled = false;
             }
-            portalTriggerCol.enabled = false;
+
             transform.position = Vector3.MoveTowards(transform.position, targetPoint, speed * Time.fixedDeltaTime);
         }
         else
         {
             if (Vector3.Distance(transform.position, pointA.position) < 0.01f)
             {
-                portalTriggerCol.enabled = true;
+                if (portalTriggerCol != null)
+                {
+                    portalTriggerCol.enabled = true;
+                }
                 return;
             }
-            GameObject[] activePortals = GameObject.FindGameObjectsWithTag("Portal");
 
-            foreach (GameObject port in activePortals)
+            if (portalTriggerCol != null)
             {
-                if (port.GetComponent<Portal>().sitsOn == portalTriggerCol)
+                GameObject[] activePortals = GameObject.FindGameObjectsWithTag("Portal");
+
+                foreach (GameObject port in activePortals)
                 {
-                    port.GetComponent<Portal>().linkedPortal.Unlink();
-                    GameObject.Destroy(port);
+                    if (port.GetComponent<Portal>().sitsOn == portalTriggerCol)
+                    {
+                        port.GetComponent<Portal>().linkedPortal.Unlink();
+                        GameObject.Destroy(port);
+                    }
                 }
+                portalTriggerCol.enabled = false;
             }
-            portalTriggerCol.enabled = false;
             transform.position = Vector3.MoveTowards(transform.position, pointA.position, speed * Time.fixedDeltaTime);
         }
     }
