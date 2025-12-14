@@ -10,7 +10,7 @@ public class LaserController : MonoBehaviour
     public float rotationSpeed = 30f;
     public float laserLength = 50f;
 
-    void Update()
+    void FixedUpdate()
     {
         RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.right, laserLength);
         lineRenderer.SetPosition(0, transform.position);
