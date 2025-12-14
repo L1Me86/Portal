@@ -100,7 +100,7 @@ public class LaserClone : MonoBehaviour
         }
     }
 
-    void Update()
+    void FixedUpdate()
     {
         if (lineRenderer.enabled)
         {
