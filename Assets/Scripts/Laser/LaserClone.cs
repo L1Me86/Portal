@@ -29,13 +29,13 @@ public class LaserClone : MonoBehaviour
     public void HideClone()
     {
         lineRenderer.enabled = false;
-        transform.position = initialPosition; 
+        transform.position = initialPosition;
     }
 
     void UpdateLaser()
     {
         if (!lineRenderer.enabled) return;
-        
+
         RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.right, laserLength);
         RaycastHit2D currentHit = hit;
         lineRenderer.SetPosition(0, transform.position);
@@ -45,13 +45,19 @@ public class LaserClone : MonoBehaviour
             float remainingDistance = laserLength - Vector2.Distance(transform.position, currentHit.point);
             currentHit = Physics2D.Raycast(currentHit.point + (Vector2)transform.right * 0.05f, transform.right, remainingDistance);
         }
+
         if (currentHit.collider != null)
         {
             lineRenderer.SetPosition(1, currentHit.point);
             if (currentHit.collider.CompareTag("Player")) FindObjectOfType<GameManager>().EndGame();
-            if (currentHit.collider.CompareTag("LaserReceiver")) FindObjectOfType<MovingPlatform>().isLaserReceiverOn2 = true;
-        }
 
+            // Проверяем, есть ли компонент LaserReceiver и активируем связанную платформу
+            LaserReceiver receiver = currentHit.collider.GetComponent<LaserReceiver>();
+            if (receiver != null && receiver.connectedPlatform != null)
+            {
+                receiver.connectedPlatform.isActivated = true;
+            }
+        }
         else
         {
             lineRenderer.SetPosition(1, transform.position + transform.right * laserLength);
@@ -96,7 +102,6 @@ public class LaserClone : MonoBehaviour
 
     void Update()
     {
-        FindObjectOfType<MovingPlatform>().isLaserReceiverOn2 = false;
         if (lineRenderer.enabled)
         {
             UpdateLaser();

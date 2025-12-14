@@ -346,7 +346,6 @@ public class Portal : MonoBehaviour
             pMovement.JustTeleported();
         }
 
-        // Òåëåïîðòèðóåì êóá, åñëè îí íà ðóêàõ ó èãðîêà
         if (pMovement != null && pMovement.carriedCube != null)
         {
             Vector3 cubeTargetPos = pMovement.cubeHoldPoint.position;
@@ -441,7 +440,6 @@ public class Portal : MonoBehaviour
                 }
             }
 
-            // Åñëè ýòî êóá íà çåìëå
             if (other.CompareTag("Cube"))
             {
                 TeleportCube(other);
