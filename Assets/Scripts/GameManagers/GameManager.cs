@@ -33,8 +33,8 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.R)) RestartGame();
-        if (Input.GetKeyDown(KeyCode.N) && gameIsFinished) NextLevel();
-        if (Input.GetKeyDown(KeyCode.Q) && (gameIsPaused || gameIsEnded || gameIsFinished)) ToMainMenu();
+        if (Input.GetKeyDown(KeyCode.N) && gameIsFinished && SceneManager.GetActiveScene().buildIndex != 7) NextLevel();
+        if (Input.GetKeyDown(KeyCode.L) && (gameIsPaused || gameIsEnded || gameIsFinished)) ToMainMenu();
         if (Input.GetKeyDown(KeyCode.Escape) && !gameIsEnded && !gameIsFinished)
         if (gameIsPaused) ResumeGame();
         else PauseGame();
@@ -77,13 +77,13 @@ public class GameManager : MonoBehaviour
     {
         ButtonSound.Play();
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        SceneManager.LoadScene((currentSceneIndex + 1) % (SceneManager.sceneCountInBuildSettings - 1));
+        SceneManager.LoadScene(currentSceneIndex + 1);
     }
 
     public void ToMainMenu()
     {
         ButtonSound.Play();
-        SceneManager.LoadScene(0);
+        SceneManager.LoadScene(1);
     }
 
     public void EndGame()

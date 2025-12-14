@@ -6,6 +6,13 @@ public class MainMenuManager : MonoBehaviour
 {
     [SerializeField] private AudioSource ñlickSound;
 
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.L)) LoadLevel(1);
+        if (Input.GetKeyDown(KeyCode.S)) LoadLevel(2);
+        if (Input.GetKeyDown(KeyCode.Q)) QuitGame();
+    }
+
     private void Start()
     {
         ñlickSound.Stop();        

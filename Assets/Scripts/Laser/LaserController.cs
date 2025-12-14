@@ -5,14 +5,13 @@ using UnityEngine;
 public class LaserController : MonoBehaviour
 {
     [SerializeField] private AudioSource laserSound;
-    public LaserClone laserGunClone; 
+    public LaserClone laserGunClone;
     public LineRenderer lineRenderer;
     public float rotationSpeed = 30f;
     public float laserLength = 50f;
 
     void Update()
     {
-        FindObjectOfType<MovingPlatform>().isLaserReceiverOn1 = false;
         RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.right, laserLength);
         lineRenderer.SetPosition(0, transform.position);
         RaycastHit2D currentHit = hit;
@@ -26,7 +25,14 @@ public class LaserController : MonoBehaviour
         if (currentHit.collider != null)
         {
             lineRenderer.SetPosition(1, currentHit.point);
-            if (currentHit.collider.CompareTag("LaserReceiver")) FindObjectOfType<MovingPlatform>().isLaserReceiverOn1 = true;
+
+            // Проверяем, есть ли компонент LaserReceiver и активируем связанную платформу
+            LaserReceiver receiver = currentHit.collider.GetComponent<LaserReceiver>();
+            if (receiver != null && receiver.connectedPlatform != null)
+            {
+                receiver.connectedPlatform.isActivated = true;
+            }
+
             if (currentHit.collider.CompareTag("Player")) FindObjectOfType<GameManager>().EndGame();
             if (currentHit.collider.CompareTag("Portal"))
             {

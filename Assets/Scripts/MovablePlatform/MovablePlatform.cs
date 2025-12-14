@@ -9,9 +9,8 @@ public class MovingPlatform : MonoBehaviour
     public float speed = 2f;
     public Vector2 platformVelocity;
     public Button button;
-    public bool stay;
-    public bool isLaserReceiverOn1 = false;
-    public bool isLaserReceiverOn2 = false;
+    public bool stay; 
+    public bool isActivated = false;
     public Collider2D portalTriggerCol;
 
     private Vector3 targetPoint;
@@ -31,20 +30,23 @@ public class MovingPlatform : MonoBehaviour
     {
         if (stay)
         {
-            if ((button != null && button.isPressed) || isLaserReceiverOn1 || isLaserReceiverOn2)
+            if ((button != null && button.isPressed) || isActivated)
             {
                 MovePlatformFixedStay(true);
+                isActivated = false;
             }
             else
             {
                 MovePlatformFixedStay(false);
+                isActivated = false;
             }
         }
         else
         {
-            if ((button != null && button.isPressed) || isLaserReceiverOn1 || isLaserReceiverOn2)
+            if ((button != null && button.isPressed) || isActivated)
             {
                 MovePlatformFixed();
+                isActivated = false;
             }
         }
 
