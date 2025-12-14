@@ -14089,6 +14089,7 @@ GameObject:
   - component: {fileID: 1743962426}
   - component: {fileID: 1743962425}
   - component: {fileID: 1743962427}
+  - component: {fileID: 1743962428}
   m_Layer: 0
   m_Name: LaserReceiver
   m_TagString: LaserReceiver
@@ -14208,6 +14209,19 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &1743962428
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1743962424}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39a66e38d3968e144a5c8b07cd2ba3ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _connectedPlatform: {fileID: 1820670263}
 --- !u!1 &1762931510
 GameObject:
   m_ObjectHideFlags: 0
@@ -14637,6 +14651,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3419168822478345490, guid: 7ae45acc038e45e43942c4697388840a, type: 3}
   m_PrefabInstance: {fileID: 1800025150}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1820670263 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7312105860803608485, guid: de7cd4b24d322e7438f649914a2fb032, type: 3}
+  m_PrefabInstance: {fileID: 526317315}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aaf523ff379f6d240b31ed932737a3f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1825251468
 PrefabInstance:
   m_ObjectHideFlags: 0
