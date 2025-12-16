@@ -15,7 +15,6 @@ public class SettingsManager : MonoBehaviour
     {
         сlickSound.Stop();
         fpsDropdown.value = FPSValues.IndexOf(Application.targetFrameRate);
-        Debug.Log($"Файлы сохранений здесь: {Application.persistentDataPath}");
     }
 
     void Update()
@@ -30,7 +29,6 @@ public class SettingsManager : MonoBehaviour
         Application.targetFrameRate = FPSValues[fpsDropdown.value];
         PlayerPrefs.SetInt("SavedFPS", targetFPS);
         PlayerPrefs.Save();
-        Debug.Log($"Установлен FPS: {Application.targetFrameRate}");
     }   
 
     public void ToMainMenu()

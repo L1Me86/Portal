@@ -21,7 +21,6 @@ public class LevelsManager : MonoBehaviour
     {
         ñlickSound.Play();
         if (levelIndex >= 0 && levelIndex < SceneManager.sceneCountInBuildSettings) SceneManager.LoadScene(levelIndex);
-        else Debug.LogError($"Óðîâåíü ñ èíäåêñîì {levelIndex} íå íàéäåí!");
     }
 
     public void ToMainMenu()
