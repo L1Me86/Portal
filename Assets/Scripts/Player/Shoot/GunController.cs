@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class GunController : MonoBehaviour
 {
+    [SerializeField] private AudioSource ShootSound;
+    [SerializeField] public AudioSource BulletSound;
     public Transform firePoint;
     public Transform ghostFirePoint;
     public GameObject bulletPrefab;
@@ -16,6 +18,12 @@ public class GunController : MonoBehaviour
     private static Portal bluePortal;
     private static Portal orangePortal;
 
+    void Start()
+    {
+        ShootSound.Stop();
+        BulletSound.Stop();
+    }
+
     void Update()
     {
         if (GameManager.gameIsPaused || GameManager.gameIsEnded || GameManager.gameIsFinished) return;
@@ -25,6 +33,7 @@ public class GunController : MonoBehaviour
 
     void Shoot(bool isBlue)
     {
+        ShootSound.Play();
         bool transformToGhost = PlayerMovement.bulletTransform();
 
         GameObject bullet = Instantiate(bulletPrefab, transformToGhost ? ghostFirePoint.position : firePoint.position, firePoint.rotation);
